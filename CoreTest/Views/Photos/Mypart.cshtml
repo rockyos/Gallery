@@ -1,0 +1,17 @@
+﻿@model CoreTest.Models.Photo;
+    <tr id="@Model.Id">
+        <td>
+            <a id="single_image" href="@Model.PhotoPath">
+                <img class="img-thumbnail  mx-auto d-block" src="@Model.PhotoPath_S" alt="Foto" />
+            </a>
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.PhotoName)
+        </td>
+        <td>
+            <form asp-action="Delete" method="post" id="@Model.Id" class="delete_form">
+                <input type="hidden" asp-for="Id" name="Id" />
+                <input type="submit" value="Delete" class="btn btn-outline-danger  font-weight-bold" /> 
+            </form>
+        </td>
+    <tr>

@@ -1,0 +1,57 @@
+﻿@model CoreTest.Models.Photo;
+
+@{
+    ViewData["Title"] = "Index";
+    var Photos = ViewBag.Photos as List<Photo>;
+}
+
+<table class="table" id="g_table">
+    <tbody>
+        @foreach (var item in Photos)
+        {
+            <tr id="@item.Id">
+                <td>
+                    <a id="single_image" href="@item.PhotoPath">
+                        <img class="img-thumbnail mx-auto d-block" src="@item.PhotoPath_S" alt="Foto" />
+                    </a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PhotoName)
+                </td>
+                <td>
+                    <form asp-action="Delete" method="post" id="@item.Id" class="delete_form">
+                        <input type="hidden" asp-for="@item.Id" name="Id"/>
+                        <input type="submit" value="Delete" class="btn btn-outline-danger font-weight-bold" /> 
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<form id="post_file_form" enctype="multipart/form-data" method="post">
+    <div class="d-flex justify-content-center">
+        <div class="btn sendbtn btn-outline-info">
+            <span class="font-weight-bold">Select image</span>
+            <input asp-for="FormFile" type="file" name="FormFile" /><img id="loaderimg" src="~/images/loaderimg.gif" />
+            <span asp-validation-for="FormFile" class="text-danger font-weight-bold"></span>
+        </div>
+
+    </div>
+    <div class="d-flex justify-content-center" id="pre_img_div"></div>
+    <hr />
+    <div class="d-flex justify-content-end">
+        <div class="btn-group" role="group">
+
+            <input type="reset" id="btn_reset" value="Cancel" class="btn btn-outline-dark font-weight-bold" />
+
+            <input type="submit" value="Save" class="btn btn-outline-success font-weight-bold" />
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+

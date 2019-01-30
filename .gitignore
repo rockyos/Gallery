@@ -1,0 +1,5 @@
+CoreTest/bin/
+CoreTest/obj/
+.vs/
+CoreTest/bower_components/
+CoreTest/node_modules/
