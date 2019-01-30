@@ -46,8 +46,13 @@ namespace CoreTest.Controllers
                 file_name += file_ext;
                 file_name_small += file_ext;
                 string dir = @"\photo\";
-                string fullpathname = Path.Combine(_hostingEnvironment.WebRootPath + dir, file_name);
-                string fullpathname_small = Path.Combine(_hostingEnvironment.WebRootPath + dir, file_name_small);
+                string path_f = _hostingEnvironment.WebRootPath + dir;
+                if (!Directory.Exists(path_f))
+                {
+                    Directory.CreateDirectory(path_f);
+                }
+                string fullpathname = Path.Combine(path_f, file_name);
+                string fullpathname_small = Path.Combine(path_f, file_name_small);
                 model.PhotoName = file.FileName.Substring(0, file.FileName.LastIndexOf('.'));
                 model.PhotoPath = Path.Combine(dir, file_name);
                 model.PhotoPath_S = Path.Combine(dir, file_name_small);
