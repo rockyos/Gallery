@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using CoreTest.Models;
+using CoreTest.ViewModels.Photos;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using CoreTest.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Hosting;
-using System.IO;
-using System.Diagnostics;
 
 namespace CoreTest.Controllers
 {
@@ -27,35 +25,38 @@ namespace CoreTest.Controllers
 
         public async Task<IActionResult> Index()
         {
-            ViewBag.Photos = await db.Photos.ToListAsync();
-            return View(); 
+            var viewModel = new IndexViewModel
+            {
+                Photos = await db.Photos.ToListAsync()
+            };
+            return View(viewModel);
         }
 
-     
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult>  Index (Photo model)
+        public async Task<IActionResult> Index(Photo model)
         {
             ViewBag.Photos = await db.Photos.ToListAsync();
             if (ModelState.IsValid)
             {
                 var file = model.FormFile;
-                string file_name = Guid.NewGuid().ToString();
-                string file_name_small = file_name + "_s";
+                string fileName = Guid.NewGuid().ToString();
+                string fileNameSmall = fileName + "_s";
                 string file_ext = Path.GetExtension(file.FileName);
-                file_name += file_ext;
-                file_name_small += file_ext;
+                fileName += file_ext;
+                fileNameSmall += file_ext;
                 string dir = @"\photo\";
                 string path_f = _hostingEnvironment.WebRootPath + dir;
                 if (!Directory.Exists(path_f))
                 {
                     Directory.CreateDirectory(path_f);
                 }
-                string fullpathname = Path.Combine(path_f, file_name);
-                string fullpathname_small = Path.Combine(path_f, file_name_small);
+                string fullpathname = Path.Combine(path_f, fileName);
+                string fullpathname_small = Path.Combine(path_f, fileNameSmall);
                 model.PhotoName = file.FileName.Substring(0, file.FileName.LastIndexOf('.'));
-                model.PhotoPath = Path.Combine(dir, file_name);
-                model.PhotoPath_S = Path.Combine(dir, file_name_small);
+                model.PhotoPath = Path.Combine(dir, fileName);
+                model.PhotoPath_S = Path.Combine(dir, fileNameSmall);
 
                 using (var stream = new FileStream(fullpathname, FileMode.Create))
                 {
@@ -80,13 +81,16 @@ namespace CoreTest.Controllers
         {
             var photo = await db.Photos.FindAsync(id);
             db.Photos.Remove(photo);
-            try {
+            try
+            {
                 string path = _hostingEnvironment.WebRootPath + photo.PhotoPath;
                 string path_small = _hostingEnvironment.WebRootPath + photo.PhotoPath_S;
                 System.IO.File.Delete(path_small);
                 System.IO.File.Delete(path);
-                
-            } catch (Exception ex) {
+
+            }
+            catch (Exception ex)
+            {
                 Debug.WriteLine(ex.Message);
             }
             await db.SaveChangesAsync();

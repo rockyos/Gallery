@@ -3,3 +3,4 @@ CoreTest/obj/
 .vs/
 CoreTest/bower_components/
 CoreTest/node_modules/
+CoreTest/wwwroot/photo/

@@ -1,13 +1,12 @@
-﻿@model CoreTest.Models.Photo;
+﻿@model CoreTest.ViewModels.Photos.IndexViewModel;
 
 @{
     ViewData["Title"] = "Index";
-    var Photos = ViewBag.Photos as List<Photo>;
 }
 
 <table class="table" id="g_table">
     <tbody>
-        @foreach (var item in Photos)
+        @foreach (var item in Model.Photos)
         {
             <tr id="@item.Id">
                 <td>
