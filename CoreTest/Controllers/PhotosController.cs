@@ -13,12 +13,12 @@ namespace CoreTest.Controllers
 {
     public class PhotosController : Controller
     {
-        private readonly PhotoContext db;
         private IHostingEnvironment _hostingEnvironment;
+        private readonly IRepository _repository;
 
-        public PhotosController(PhotoContext context, IHostingEnvironment environment)
+        public PhotosController(IHostingEnvironment environment, IRepository repository)
         {
-            db = context;
+            _repository = repository;
             _hostingEnvironment = environment;
         }
 
@@ -27,7 +27,7 @@ namespace CoreTest.Controllers
         {
             var viewModel = new IndexViewModel
             {
-                Photos = await db.Photos.ToListAsync()
+                Photos = await _repository.GetAll()
             };
             return View(viewModel);
         }
@@ -37,7 +37,6 @@ namespace CoreTest.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(Photo model)
         {
-            ViewBag.Photos = await db.Photos.ToListAsync();
             if (ModelState.IsValid)
             {
                 var file = model.FormFile;
@@ -68,8 +67,8 @@ namespace CoreTest.Controllers
                     model.PhotoPath_S = model.PhotoPath;
                 }
 
-                db.Add(model);
-                await db.SaveChangesAsync();
+                _repository.Add(model);
+                await _repository.SaveChanges();
                 return PartialView("Mypart", model);
             }
             return RedirectToAction(nameof(Index));
@@ -77,10 +76,10 @@ namespace CoreTest.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var photo = await db.Photos.FindAsync(id);
-            db.Photos.Remove(photo);
+            var photo = await _repository.GetOne(id);
+            _repository.Remove(photo);
             try
             {
                 string path = _hostingEnvironment.WebRootPath + photo.PhotoPath;
@@ -93,13 +92,13 @@ namespace CoreTest.Controllers
             {
                 Debug.WriteLine(ex.Message);
             }
-            await db.SaveChangesAsync();
+            await _repository.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool PhotoExists(int id)
-        {
-            return db.Photos.Any(e => e.Id == id);
-        }
+        //private bool PhotoExists(int id)
+        //{
+        //    return db.Photos.Any(e => e.Id == id);
+        //}
     }
 }
