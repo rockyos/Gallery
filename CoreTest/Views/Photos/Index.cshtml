@@ -10,8 +10,8 @@
         {
             <tr id="@item.Id">
                 <td>
-                    <a id="single_image" href="@item.PhotoPath">
-                        <img class="img-thumbnail mx-auto d-block" src="@item.PhotoPath_S" alt="Foto" />
+                    <a id="single_image" href="data:image/jpeg;base64,@Convert.ToBase64String(item.ImageContent)">
+                        <img class="img-thumbnail mx-auto d-block"  src="@Url.Action("ImageResize","Photos", new { id = item.Id })?width=320" alt="Foto" />  
                     </a>
                 </td>
                 <td>

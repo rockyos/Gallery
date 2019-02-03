@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,13 +16,50 @@ namespace CoreTest.Controllers
 {
     public class PhotosController : Controller
     {
-        private IHostingEnvironment _hostingEnvironment;
-        private readonly IRepository _repository;
+        IHostingEnvironment _hostingEnvironment;
+        readonly IRepository _repository;
 
-        public PhotosController(IHostingEnvironment environment, IRepository repository)
+        public PhotosController(IHostingEnvironment environment, IRepository repository) 
         {
             _repository = repository;
             _hostingEnvironment = environment;
+        }
+
+        public async Task<IActionResult> ImageResize(int id, int width)
+        {
+            Photo photo = await _repository.GetOne(id);
+            Bitmap bmp;
+
+            MemoryStream memoryStream = new MemoryStream();
+            const long quality = 50;
+            using (var ms = new MemoryStream(photo.ImageContent))
+            {
+                bmp = new Bitmap(ms);
+                int imageHeight = bmp.Height;
+                int imageWidth = bmp.Width;
+                if (imageWidth > width)
+                {
+                    float ratio = (float)imageWidth / (float)imageHeight;
+                    var resized_Bitmap = new Bitmap((int)width, (int)(width / ratio));
+                    using (var graphics = Graphics.FromImage(resized_Bitmap))
+                    {
+                        graphics.CompositingQuality = CompositingQuality.HighSpeed;
+                        graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                        graphics.CompositingMode = CompositingMode.SourceCopy;
+                        graphics.DrawImage(bmp, 0, 0, width, width / ratio);
+
+                        var qualityParamId = Encoder.Quality;
+                        var encoderParameters = new EncoderParameters(1);
+                        encoderParameters.Param[0] = new EncoderParameter(qualityParamId, quality);
+                        var codec = ImageCodecInfo.GetImageDecoders().FirstOrDefault(c => c.FormatID == ImageFormat.Jpeg.Guid);
+                        resized_Bitmap.Save(memoryStream, ImageFormat.Jpeg);
+                    }
+                }
+                else {
+                    bmp.Save(memoryStream, ImageFormat.Jpeg);
+                }
+            }
+            return new FileContentResult(memoryStream.ToArray(), "binary/octet-stream");
         }
 
 
@@ -36,37 +76,16 @@ namespace CoreTest.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(Photo model)
-        {
+        {        
             if (ModelState.IsValid)
             {
-                var file = model.FormFile;
-                string fileName = Guid.NewGuid().ToString();
-                string fileNameSmall = fileName + "_s";
-                string file_ext = Path.GetExtension(file.FileName);
-                fileName += file_ext;
-                fileNameSmall += file_ext;
-                string dir = @"\photo\";
-                string path_f = _hostingEnvironment.WebRootPath + dir;
-                if (!Directory.Exists(path_f))
+                byte[] img; 
+                using (var reader = new BinaryReader(model.FormFile.OpenReadStream()))
                 {
-                    Directory.CreateDirectory(path_f);
-                }
-                string fullpathname = Path.Combine(path_f, fileName);
-                string fullpathname_small = Path.Combine(path_f, fileNameSmall);
-                model.PhotoName = file.FileName.Substring(0, file.FileName.LastIndexOf('.'));
-                model.PhotoPath = Path.Combine(dir, fileName);
-                model.PhotoPath_S = Path.Combine(dir, fileNameSmall);
-
-                using (var stream = new FileStream(fullpathname, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-                float pic_width = 480;
-                if (!PhotoResizer.Image_resize(fullpathname, fullpathname_small, pic_width))
-                {
-                    model.PhotoPath_S = model.PhotoPath;
+                    img = reader.ReadBytes((int)model.FormFile.Length);
                 }
 
+                model.ImageContent = img;
                 _repository.Add(model);
                 await _repository.SaveChanges();
                 return PartialView("Mypart", model);
@@ -79,19 +98,7 @@ namespace CoreTest.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var photo = await _repository.GetOne(id);
-            _repository.Remove(photo);
-            try
-            {
-                string path = _hostingEnvironment.WebRootPath + photo.PhotoPath;
-                string path_small = _hostingEnvironment.WebRootPath + photo.PhotoPath_S;
-                System.IO.File.Delete(path_small);
-                System.IO.File.Delete(path);
-
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-            }
+            _repository.Remove(photo);    
             await _repository.SaveChanges();
             return RedirectToAction(nameof(Index));
         }

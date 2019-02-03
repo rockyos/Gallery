@@ -7,6 +7,10 @@ namespace CoreTest.Models
 {
     public class PhotoContext : DbContext
     {
+        public PhotoContext()
+        {
+        }
+
         public PhotoContext(DbContextOptions<PhotoContext> options) : base(options)
         {
             Database.EnsureCreated();
@@ -14,6 +18,7 @@ namespace CoreTest.Models
 
         public DbSet<Photo> Photos { get; set; }
     }
+
     public interface IRepository
     {
         Task<List<Photo>> GetAll();
@@ -48,5 +53,44 @@ namespace CoreTest.Models
             _context.SaveChangesAsync();
     }
 
+    //public class UnitOfWork : IDisposable
+    //{
+    //    PhotoContext db = new PhotoContext();
+    //    PhotoRepository repository;
 
+    //    public PhotoRepository Photos
+    //    {
+    //        get
+    //        {
+    //            if (repository == null)
+    //                repository = new PhotoRepository(db);
+    //            return repository;
+    //        }
+    //    }
+
+    //    public void Save()
+    //    {
+    //        db.SaveChanges();
+    //    }
+
+    //    bool disposed = false;
+
+    //    public virtual void Dispose(bool disposing)
+    //    {
+    //        if (!disposed)
+    //        {
+    //            if (disposing)
+    //            {
+    //                db.Dispose();
+    //            }
+    //            disposed = true;
+    //        }
+    //    }
+
+    //    public void Dispose()
+    //    {
+    //        Dispose(true);
+    //        GC.SuppressFinalize(this);
+    //    }
+    //}
 }

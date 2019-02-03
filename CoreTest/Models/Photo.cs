@@ -21,8 +21,7 @@ namespace CoreTest.Models
         //[FileSize("2000000", "File is too big!")]
         public IFormFile FormFile { get; set; }
 
-        public string PhotoPath { get; set; }
+        public byte[] ImageContent { get; set; }
         public string PhotoName { get; set; }
-        public string PhotoPath_S { get; set; }
     }
 }

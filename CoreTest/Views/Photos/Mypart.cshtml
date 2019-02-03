@@ -1,8 +1,8 @@
 ﻿@model CoreTest.Models.Photo;
     <tr id="@Model.Id">
         <td>
-            <a id="single_image" href="@Model.PhotoPath">
-                <img class="img-thumbnail  mx-auto d-block" src="@Model.PhotoPath_S" alt="Foto" />
+            <a id="single_image" href="data:image/jpeg;base64,@Convert.ToBase64String(Model.ImageContent)">
+                <img class="img-thumbnail  mx-auto d-block" src="@Url.Action("ImageResize","Photos", new { id = Model.Id })?width=320" alt="Foto" />
             </a>
         </td>
         <td>
