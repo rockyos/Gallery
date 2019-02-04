@@ -1,4 +1,5 @@
 ﻿using CoreTest.Models;
+using CoreTest.Repository;
 using CoreTest.ViewModels.Photos;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -16,15 +17,14 @@ namespace CoreTest.Controllers
 {
     public class PhotosController : Controller
     {
-        IHostingEnvironment _hostingEnvironment;
         readonly IRepository _repository;
 
-        public PhotosController(IHostingEnvironment environment, IRepository repository) 
+        public PhotosController(IRepository repository) 
         {
             _repository = repository;
-            _hostingEnvironment = environment;
         }
 
+        [ResponseCache(Location = ResponseCacheLocation.Any, Duration = 300)]
         public async Task<IActionResult> ImageResize(int id, int width)
         {
             Photo photo = await _repository.GetOne(id);
