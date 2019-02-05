@@ -23,11 +23,14 @@ namespace CoreTest
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             ValidationResult validationResult = ValidationResult.Success;
-            IFormFile file = value as IFormFile;
-
-            if (val_file_size < file.Length)
+            List<IFormFile> file = value as List<IFormFile>;
+            foreach (var item in file)
             {
-                 validationResult = new ValidationResult(errorMessageString);
+                if (val_file_size < item.Length)
+                {
+                    validationResult = new ValidationResult(errorMessageString);
+                    return validationResult;
+                }
             }
             return validationResult;
         }

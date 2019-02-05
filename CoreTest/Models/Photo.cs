@@ -19,7 +19,7 @@ namespace CoreTest.Models
         [DataType(DataType.Upload)]
         [FileExtensions("jpg,jpeg,png,gif","File must be image!")]
         [FileSize("2000000", "File is too big!")]
-        public IFormFile FormFile { get; set; }
+        public List<IFormFile> FormFile { get; set; }
 
         public byte[] ImageContent { get; set; }
         public string PhotoName { get; set; }

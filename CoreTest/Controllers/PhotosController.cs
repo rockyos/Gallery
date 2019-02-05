@@ -2,9 +2,11 @@
 using CoreTest.Repository;
 using CoreTest.ViewModels.Photos;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -76,19 +78,25 @@ namespace CoreTest.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(Photo model)
-        {        
+        {
             if (ModelState.IsValid)
             {
-                byte[] img; 
-                using (var reader = new BinaryReader(model.FormFile.OpenReadStream()))
+                List<Photo> photolist = new List<Photo>();
+                foreach (var item in model.FormFile)
                 {
-                    img = reader.ReadBytes((int)model.FormFile.Length);
+                    byte[] img;
+                    using (var reader = new BinaryReader(item.OpenReadStream()))
+                    {
+                        img = reader.ReadBytes((int)item.Length);
+                    }                  
+                    photolist.Add(new Photo { PhotoName = item.FileName, ImageContent = img });
                 }
-
-                model.ImageContent = img;
-                _repository.Add(model);
+                foreach (var item in photolist)
+                {
+                    _repository.Add(item);
+                }
                 await _repository.SaveChanges();
-                return PartialView("Mypart", model);
+                return PartialView("Mypart", photolist);
             }
             return RedirectToAction(nameof(Index));
         }
