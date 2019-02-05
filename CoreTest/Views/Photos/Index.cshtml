@@ -32,7 +32,7 @@
     <div class="d-flex justify-content-center">
         <div class="btn sendbtn btn-outline-info">
             <span class="font-weight-bold">Select image</span>
-            <input asp-for="FormFile" type="file" name="FormFile" /><img id="loaderimg" src="~/images/loaderimg.gif" />
+            <input asp-for="FormFile" type="file" name="FormFile" />@*<img id="loaderimg" src="~/images/loaderimg.gif" />*@
             <span asp-validation-for="FormFile" class="text-danger font-weight-bold"></span>
         </div>
     </div>
@@ -41,7 +41,9 @@
     <div class="d-flex justify-content-end">
         <div class="btn-group" role="group">
             <input type="reset" id="btn_reset" value="Cancel" class="btn btn-outline-dark font-weight-bold" />
-            <input type="submit" value="Save" class="btn btn-outline-success font-weight-bold" />
+            <button type="submit" class="btn btn-outline-success font-weight-bold">
+                Save <img id="loaderimg" src="~/images/loaderimg.gif" />
+            </button>
         </div>
     </div>
 </form>

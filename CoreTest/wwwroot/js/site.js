@@ -1,5 +1,5 @@
 ﻿
-var filearray = [];///массив отправляемых файлов
+var filearray = [];///список отправляемых файлов
 $(document).on('submit', '#post_file_form', function (event) {
         event.preventDefault();
         $('#loaderimg').show();
@@ -26,38 +26,34 @@ $(document).on('submit', '#post_file_form', function (event) {
             }
         });
 });
-
+var temparr = [];
 $(document).ready(function () {
     $('#loaderimg').hide();
     $("a#single_image").fancybox();
     $('input[type=file]').change(function (event) {
         var temp_path = URL.createObjectURL(event.target.files[0]);
-        var temp_name = event.target.files[0].name;
         var valid = $('#post_file_form').valid();
         if (valid) {
             filearray.push(event.target.files[0]);
-
             var name_temp = event.target.files[0].name;
-            var namefile = name_temp.substring(0, name_temp.indexOf('.'));
-
+            var namefile = name_temp.substring(0, name_temp.indexOf('.')) + "_" + (new Date()).getTime().toString(36);
+            temparr.push(namefile);
             var tempimg = $('<img>', { id: 'pre_Img', src: temp_path }).addClass('img-thumbnail mx-auto d-block').css({ 'max-height': '480px', 'max-width': '320px' });
             $('#g_table').find('tbody:last').append('<tr id="addsite_' + namefile + '"><td><a id="single_image" href="' + temp_path +
-                '"></a></td><td>' + temp_name + '</td><td><button id="btn_' + namefile + '" class="btn btn-outline-danger font-weight-bold">Delete</button></td></tr>');
+                '"></a></td><td>' + name_temp + '</td><td><button id="btn_' + namefile + '" class="btn btn-outline-danger font-weight-bold">Delete</button></td></tr>');
             $('#g_table').find('tbody tr:last-child #single_image').append($(tempimg.prop('outerHTML')));
 
 
             $('#btn_' + namefile).click(function () {
                 var row = $('#g_table').find('#addsite_' + namefile);
-                row.fadeOut(100, function () {
+                row.fadeOut(200, function () {
                     row.remove();
                 });
-                $(filearray).each(function (index) {
-                    var temp = filearray[index].name;
-                    var namefile1 = temp.substring(0, temp.indexOf('.'));
-                    if (namefile1 === namefile) {
-                        filearray.splice(index, 1);
-                    }
-                });
+
+                var myindex = $.inArray(namefile, temparr);
+                filearray.splice(myindex, 1);
+                temparr.splice(myindex,1);
+
                 if (filearray.length === 0) {
                     $('#btn_reset').click();
                 }
@@ -67,15 +63,15 @@ $(document).ready(function () {
     });
 
     $('#btn_reset').click(function () {
-        $(filearray).each(function (index) {
-            var temp = filearray[index].name;
-            var namefile1 = temp.substring(0, temp.indexOf('.'));
-            var row = $('#g_table').find('#addsite_' + namefile1);
+        $(temparr).each(function (index) {
+            var name = temparr[index];
+            var row = $('#g_table').find('#addsite_' + name);
             row.fadeOut(200, function () {
                 row.remove();
             });
         });
         filearray = [];
+        temparr = [];
     });
 
 });
