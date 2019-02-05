@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CoreTest.Models;
 using CoreTest.Repository;
+using CoreTest.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -39,6 +40,8 @@ namespace CoreTest
             });
 
             services.AddScoped<IRepository, PhotoRepository>();
+            services.AddScoped<IResizeService, ResizeService>();
+            services.AddScoped<IPhotolistService, PhotolistService>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddViewOptions(options =>

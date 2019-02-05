@@ -26,7 +26,7 @@ $(document).on('submit', '#post_file_form', function (event) {
             }
         });
 });
-var temparr = [];
+var temparr = [];// список для хранения уникальных имен файлов
 $(document).ready(function () {
     $('#loaderimg').hide();
     $("a#single_image").fancybox();
@@ -42,7 +42,7 @@ $(document).ready(function () {
             $('#g_table').find('tbody:last').append('<tr id="addsite_' + namefile + '"><td><a id="single_image" href="' + temp_path +
                 '"></a></td><td>' + name_temp + '</td><td><button id="btn_' + namefile + '" class="btn btn-outline-danger font-weight-bold">Delete</button></td></tr>');
             $('#g_table').find('tbody tr:last-child #single_image').append($(tempimg.prop('outerHTML')));
-
+            $("a#single_image").fancybox();
 
             $('#btn_' + namefile).click(function () {
                 var row = $('#g_table').find('#addsite_' + namefile);
