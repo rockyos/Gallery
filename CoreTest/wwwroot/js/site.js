@@ -1,4 +1,5 @@
-﻿
+﻿var serverfile = [];// список на удаление с БД
+var temparr = [];// список для хранения уникальных имен файлов
 var filearray = [];///список отправляемых файлов
 $(document).on('submit', '#post_file_form', function (event) {
         event.preventDefault();
@@ -19,6 +20,7 @@ $(document).on('submit', '#post_file_form', function (event) {
                 $('#btn_reset').click();
                 $('#g_table').find('tbody:last').append(result);
                 $('#loaderimg').hide();
+                btnclickregistration();
                 $("a#single_image").fancybox();
             },
             error: function (error) {
@@ -26,7 +28,29 @@ $(document).on('submit', '#post_file_form', function (event) {
             }
         });
 });
-var temparr = [];// список для хранения уникальных имен файлов
+
+function btnclickregistration() { 
+    $("button[id^='serverbtn_']").click(function () {
+        var btn = $(this).attr('id');
+        var id = btn.substring(btn.indexOf('_') + 1);
+        serverfile.push(id);
+        var row = $('#g_table').find('#serverimg_' + id);
+        row.fadeOut(200, function () {
+        });
+    });
+}
+
+
+$('#sendbuttonex').click(function () {
+    if (serverfile.length === 0 || filearray.length > 0) {
+       $('#post_file_form').submit();
+    }
+    if (serverfile.length > 0) {
+      $('#delete_form').submit();
+   }
+    
+});
+
 $(document).ready(function () {
     $('#loaderimg').hide();
     $("a#single_image").fancybox();
@@ -61,7 +85,7 @@ $(document).ready(function () {
         }
         valid.form();
     });
-
+    btnclickregistration();
     $('#btn_reset').click(function () {
         $(temparr).each(function (index) {
             var name = temparr[index];
@@ -70,19 +94,26 @@ $(document).ready(function () {
                 row.remove();
             });
         });
+        $(serverfile).each(function (index) {
+            var row = $('#g_table').find('#serverimg_' + serverfile[index]);
+            row.fadeIn(200, function () {
+               
+            });
+        });
+        serverfile = [];
         filearray = [];
         temparr = [];
     });
-
 });
 
-$(document).on('submit', '.delete_form', function (event) {
+$(document).on('submit', '#delete_form', function (event) {
     event.preventDefault();
     var token = $("input[type='hidden'][name$='__RequestVerificationToken']").val();
     var formdata = new FormData();
-    var my_id = $(this).attr('id');
-    var my_id_with = '#' + my_id;
-    formdata.append('Id', my_id);
+    $(serverfile).each(function (index) {
+        formdata.append('Id', serverfile[index]);
+    });
+    serverfile = [];
     formdata.append('__RequestVerificationToken', token);
     $.ajax({
         type: 'POST',
@@ -91,10 +122,7 @@ $(document).on('submit', '.delete_form', function (event) {
         processData: false,
         contentType: false,
         success: function (result) {
-            var row = $('#g_table').find(my_id_with);
-            row.fadeOut(200, function () {
-                row.remove();
-            });
+
         }
     });
 });

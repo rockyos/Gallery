@@ -8,42 +8,40 @@
     <tbody>
         @foreach (var item in Model.Photos)
         {
-            <tr id="@item.Id">
+            <tr id="serverimg_@item.Id">
                 <td>
                     <a id="single_image" href="data:image/jpeg;base64,@Convert.ToBase64String(item.ImageContent)">
-                        <img class="img-thumbnail mx-auto d-block"  src="@Url.Action("ImageResize","Photos", new { id = item.Id })?width=320" alt="Foto" />  
+                        <img class="img-thumbnail mx-auto d-block" src="@Url.Action("ImageResize","Photos", new { id = item.Id })?width=320" alt="Foto" />
                     </a>
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.PhotoName)
                 </td>
                 <td>
-                    <form asp-action="Delete" method="post" id="@item.Id" class="delete_form">
-                        <input type="hidden" asp-for="@item.Id" name="Id"/>
-                        <input type="submit" value="Delete" class="btn btn-outline-danger font-weight-bold" /> 
-                    </form>
+                    <button id="serverbtn_@item.Id" class="btn btn-outline-danger font-weight-bold">Delete</button>
                 </td>
             </tr>
         }
     </tbody>
 </table>
 
+<form asp-action="Delete" method="post" id="delete_form"></form>
+
 <form id="post_file_form" enctype="multipart/form-data" method="post">
     <div class="d-flex justify-content-center">
         <div class="btn sendbtn btn-outline-info">
             <span class="font-weight-bold">Select image</span>
-            <input asp-for="FormFile" type="file" name="FormFile" />@*<img id="loaderimg" src="~/images/loaderimg.gif" />*@
+            <input asp-for="FormFile" type="file" name="FormFile" />
             <span asp-validation-for="FormFile" class="text-danger font-weight-bold"></span>
         </div>
     </div>
-    @*<div class="d-flex justify-content-center" id="pre_img_div"></div>*@
     <hr />
     <div class="d-flex justify-content-end">
         <div class="btn-group" role="group">
-            <input type="reset" id="btn_reset" value="Cancel" class="btn btn-outline-dark font-weight-bold" />
-            <button type="submit" class="btn btn-outline-success font-weight-bold">
-                Save <img id="loaderimg" src="~/images/loaderimg.gif" />
-            </button>
+        <input type="reset" id="btn_reset" value="Cancel" class="btn btn-outline-dark btn-sm font-weight-bold" />
+        <span id="sendbuttonex" class="btn btn-outline-success font-weight-bold">
+            Save <img id="loaderimg" src="~/images/loaderimg.gif" />
+        </span>
         </div>
     </div>
 </form>

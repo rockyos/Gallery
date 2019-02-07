@@ -64,11 +64,14 @@ namespace CoreTest.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int[] id)
         {
-            var photo = await _repository.GetOne(id);
-            _repository.Remove(photo);    
-            await _repository.SaveChanges();
+            foreach (var item in id)
+            {
+                var photo = await _repository.GetOne(item);
+                _repository.Remove(photo);
+                await _repository.SaveChanges();
+            }
             return RedirectToAction(nameof(Index));
         }
     }
