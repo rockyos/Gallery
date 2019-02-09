@@ -36,7 +36,7 @@ namespace CoreTest.Controllers
             return View("Index");
         }
         
-        [HttpGet]
+
         public async Task<IActionResult> GetListfromDB()
         {
             List<Photo> photos = await _repository.GetAll();
@@ -44,10 +44,6 @@ namespace CoreTest.Controllers
             return Json(json);
         }
 
-        private IActionResult JsonResult(List<Photo> photos)
-        {
-            throw new NotImplementedException();
-        }
 
         [HttpPost]
       //[ValidateAntiForgeryToken]
@@ -56,8 +52,9 @@ namespace CoreTest.Controllers
             if (ModelState.IsValid)
             {
                 List<Photo> photolist = _photolistService.GetPhotolistAsync(model, _repository);
-                await _repository.SaveChanges();
-                return PartialView("Mypart", photolist);
+                await _repository.SaveChanges(); 
+                var json = JsonConvert.SerializeObject(photolist);
+                return Json(json);
             }
             return RedirectToAction(nameof(Index));
         }

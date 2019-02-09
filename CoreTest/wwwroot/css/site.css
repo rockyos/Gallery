@@ -66,3 +66,6 @@ body {
     align-items:center;
     padding: 12px 25px; 
 }*/
+.table {
+    border: 0;
+}
