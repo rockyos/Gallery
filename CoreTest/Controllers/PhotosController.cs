@@ -1,19 +1,11 @@
 ﻿using CoreTest.Models;
 using CoreTest.Repository;
 using CoreTest.Services;
-using CoreTest.ViewModels.Photos;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
+
 using System.Threading.Tasks;
 
 namespace CoreTest.Controllers
@@ -41,16 +33,24 @@ namespace CoreTest.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var viewModel = new IndexViewModel
-            {
-                Photos = await _repository.GetAll()
-            };
-            return View(viewModel);
+            return View("Index");
+        }
+        
+        [HttpGet]
+        public async Task<IActionResult> GetListfromDB()
+        {
+            List<Photo> photos = await _repository.GetAll();
+            var json = JsonConvert.SerializeObject(photos);
+            return Json(json);
         }
 
+        private IActionResult JsonResult(List<Photo> photos)
+        {
+            throw new NotImplementedException();
+        }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+      //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(Photo model)
         {
             if (ModelState.IsValid)
@@ -63,7 +63,7 @@ namespace CoreTest.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+      //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int[] id)
         {
             foreach (var item in id)

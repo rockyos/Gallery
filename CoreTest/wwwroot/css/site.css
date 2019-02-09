@@ -61,8 +61,8 @@ body {
     filter: alpha(opacity=0);
 }
 
-.table td, .table th {
+/*.table td, .table th {
     vertical-align: middle;
     align-items:center;
     padding: 12px 25px; 
-}
+}*/

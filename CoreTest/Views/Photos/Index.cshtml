@@ -4,34 +4,39 @@
     ViewData["Title"] = "Index";
 }
 
-<table class="table" id="g_table">
-    <tbody>
+<table class="table table-borderless" id="table" data-toggle="table" data-response-handler="responseHandler" data-url="Photos/GetListfromDB">    @*data-ajax="ajaxRequest"*@
+    <thead>
+        <tr>
+            <th data-field="ImageContent"></th>
+            <th data-field="PhotoName"></th>
+            <th data-field="DelButton"></th>
+        </tr>
+    </thead>
+    @*<tbody>
         @foreach (var item in Model.Photos)
         {
-            <tr id="serverimg_@item.Id">
+            <tr id="@item.Id">
                 <td>
-                    <a id="single_image" href="data:image/jpeg;base64,@Convert.ToBase64String(item.ImageContent)">
-                        <img class="img-thumbnail mx-auto d-block" src="@Url.Action("ImageResize","Photos", new { id = item.Id })?width=320" alt="Foto" />
-                    </a>
+                     <img class="img-thumbnail mx-auto d-block" src="@Url.Action("ImageResize","Photos", new { id = item.Id })?width=320" alt="Foto" />
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.PhotoName)
                 </td>
                 <td>
-                    <button id="serverbtn_@item.Id" class="btn btn-outline-danger font-weight-bold">Delete</button>
+                    <button id="@item.Id" class="btn btn-outline-danger font-weight-bold">Delete</button>
                 </td>
             </tr>
         }
-    </tbody>
+    </tbody>*@
 </table>
 
-<form asp-action="Delete" method="post" id="delete_form"></form>
+
 
 <form id="post_file_form" enctype="multipart/form-data" method="post">
     <div class="d-flex justify-content-center">
         <div class="btn sendbtn btn-outline-info">
             <span class="font-weight-bold">Select image</span>
-            <input asp-for="FormFile" type="file" name="FormFile" />
+            <input asp-for="FormFile" type="file" accept="image/*" name="FormFile" />
             <span asp-validation-for="FormFile" class="text-danger font-weight-bold"></span>
         </div>
     </div>
@@ -39,15 +44,73 @@
     <div class="d-flex justify-content-end">
         <div class="btn-group" role="group">
         <input type="reset" id="btn_reset" value="Cancel" class="btn btn-outline-dark btn-sm font-weight-bold" />
-        <span id="sendbuttonex" class="btn btn-outline-success font-weight-bold">
-            Save <img id="loaderimg" src="~/images/loaderimg.gif" />
-        </span>
+        <button id="savebutton" class="btn btn-outline-success font-weight-bold">
+            Save<img id="loaderimg" src="~/images/loaderimg.gif" />
+        </button>
         </div>
     </div>
 </form>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @*@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}*@
+
+<script>
+    $(document).ready(function () {
+        $('#loaderimg').hide();
+        btnclickregistration();
+    });
+
+    function responseHandler(res) {
+        var string = JSON.parse(res);
+        $(string).each(function (index) {
+            string[index].ImageContent = '<img class="img-thumbnail mx-auto d-block" src="' + '/Photos/ImageResize/' + string[index].Id + '?width=320" alt="Foto" />';
+            Object.assign(string[index], { DelButton: '<button id="' + string[index].Id+ '" class="btndelete btn btn-outline-danger font-weight-bold">Delete</button>' });
+        });
+        btnclickregistration();
+        return string;
+    }
+
+    function btnclickregistration() {
+        $('.btndelete').click(function () {
+            var p = true;
+            var id = $(this).attr('id');
+            $.ajax({
+                url: 'Photos/Delete',
+                type: 'POST',
+                data: { id: id },
+                success: function (data) {
+                    //$('#table').bootstrapTable({
+                    //    data: data
+                    //});
+                    alert(data);
+                },
+                error: function (data) {
+                    alert('Error');
+                }
+            });
+        });
+    }
+
+//$(document).on('submit', '#post_file_form', function (event) {
+//event.preventDefault();
+//$('#loaderimg').show();
+//var formdata = new FormData();
+//formdata.append('FormFile', $("#post_file_form").get(0).files[0]);
+//$.ajax({
+//    type: 'POST',
+//    url: 'Photos/Index',
+//    data: formdata,
+//    processData: false,
+//    contentType: false,
+//    success: function (result) {
+//        $('#loaderimg').hide();
+//    },
+//    error: function (error) {
+//        $('#loaderimg').hide();
+//    }
+//});
+//});
+</script>
 }
 
 
