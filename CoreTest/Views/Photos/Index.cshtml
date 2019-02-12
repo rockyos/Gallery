@@ -25,7 +25,7 @@
     <hr />
     <div class="d-flex justify-content-end">
         <div class="btn-group" role="group">
-        <input type="reset" id="btn_reset" value="Cancel" class="btn btn-outline-dark btn-sm font-weight-bold" />
+            <span id="btn_reset" class="btn btn-outline-dark font-weight-bold">Cancel</span>
         <button id="savebutton" class="btn btn-outline-success font-weight-bold">
             Save<img id="loaderimg" src="~/images/loaderimg.gif" />
         </button>
@@ -37,28 +37,69 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
 <script>
+    var sendfiles = [];// list of files who will be add to DB
+    var delfiles = [];// list of file who will delete from DB
     $(document).ready(function () {
         $('#loaderimg').hide();
+        $('#btn_reset').click(function () {
+            sendfiles = [];
+            delfiles = [];
+            $('#table').bootstrapTable('getHiddenRows', true);
+            $('#table').bootstrapTable('refresh');
+        });
+        addNewImage();
         buttonDelClick();
     });
+
+
+    $(function () { // set fancybox effect for new <tr> in table
+        $('#table').on('load-success.bs.table', function () {
+            $("a#single_image").fancybox();
+        })
+    });
+
+    function addNewImage() { // generation HTML for new added image and add to table
+        $('input[type=file]').change(function (event) {
+            var filepath = URL.createObjectURL(event.target.files[0]);
+            var valid = $('#post_file_form').valid();
+            if (valid) {
+                var filenameGuid = (new Date()).getTime().toString(36);
+                var file = { 'file': event.target.files[0], 'nameId': filenameGuid}
+                sendfiles.push(file);
+                var filename = event.target.files[0].name;
+                var imgdata =
+                {
+                    'ImageContent': '<a id="single_image" href="' + filepath +'"><img class="img-thumbnail mx-auto d-block toclientpage" src="' + filepath + '" alt="Foto" /></a>',
+                    'PhotoName': filename,
+                    'DelButton': '<button id="' + filenameGuid + '" class="btndelete btn btn-outline-danger font-weight-bold">Delete</button>'
+                };
+                $("#table").bootstrapTable('append', imgdata);
+                $("a#single_image").fancybox();
+            }
+        });
+    }
+
+    function sendImageDelete(delfiles) {
+        $.ajax({
+            url: 'Photos/Delete',
+            type: 'POST',
+            data: { id: delfiles }
+        });
+    };
 
     function buttonDelClick() { // delete button click
         $(document).on("click", ".btndelete", function () {
             var id = $(this).attr('id');
-            var rowindex = $(this).closest('tr').data('index');
-            $.ajax({
-                url: 'Photos/Delete',
-                type: 'POST',
-                data: { id: id },
-                success: function (data) {
-                    $("#table").bootstrapTable('hideRow', {
-                        index: rowindex
-                    });
-                },
-                error: function (data) {
-                    alert('Error');
+            $(sendfiles).each(function (index) {// delete file from list to send on server(SAVE)
+                if (sendfiles[index].nameId === id) {
+                    sendfiles.splice(index, 1);
                 }
+            })
+            var rowindex = $(this).closest('tr').data('index');//get data-index and hidden deleted row
+            $("#table").bootstrapTable('hideRow', {
+                index: rowindex
             });
+            delfiles.push(id);
         });
     }
 
@@ -69,7 +110,7 @@
     function parseJsonHTML(json) { // parse json to javascript data & HTML
         var jsdata = JSON.parse(json);
         $(jsdata).each(function (index) {
-            jsdata[index].ImageContent = '<img class="img-thumbnail mx-auto d-block" src="' + '/Photos/ImageResize/' + jsdata[index].Id + '?width=320" alt="Foto" />';
+            Object.assign(jsdata[index], { ImageContent: '<a id="single_image" href="' + '/Photos/ImageResize/' + jsdata[index].Id +'"><img class="img-thumbnail mx-auto d-block" src="' + '/Photos/ImageResize/' + jsdata[index].Id + '?width=320" alt="Foto" /></a>' });
             Object.assign(jsdata[index], { DelButton: '<button id="' + jsdata[index].Id + '" class="btndelete btn btn-outline-danger font-weight-bold">Delete</button>' });
         });
         return jsdata;
@@ -77,24 +118,32 @@
 
     $(document).on('submit', '#post_file_form', function (event) {
         event.preventDefault();
-        $('#loaderimg').show();
         var formdata = new FormData();
-        formdata.append('FormFile', $('#post_file_form').find('#FormFile').get(0).files[0]);
-        $.ajax({
-           type: 'POST',
-           url: 'Photos/Index',
-           data: formdata,
-           processData: false,
-           contentType: false,
-           success: function (result) {
-               $('#loaderimg').hide();
-               var res = parseJsonHTML(result)
-               $('#table').bootstrapTable('append', res);
-           },
-           error: function (error) {
-              $('#loaderimg').hide();
-           }
-        });
+        if (sendfiles.length > 0) {
+            $('#loaderimg').show();
+            $(sendfiles).each(function (index) {
+                formdata.append('FormFile', sendfiles[index].file);
+            });
+            $.ajax({
+                type: 'POST',
+                url: 'Photos/Index',
+                data: formdata,
+                processData: false,
+                contentType: false,
+                success: function (result) {
+                    $('#loaderimg').hide();
+                    $('#table').bootstrapTable('refresh');
+                    sendfiles = [];
+                },
+                error: function (error) {
+                    $('#loaderimg').hide();
+                }
+            });
+        }
+        if (delfiles.length > 0) {
+            sendImageDelete(delfiles);
+            delfiles = [];
+        }
     });
 </script>
 }

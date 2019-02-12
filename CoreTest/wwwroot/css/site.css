@@ -69,3 +69,8 @@ body {
 .table {
     border: 0;
 }
+
+.toclientpage {
+    max-height: 480px;
+    max-width: 320px;
+}

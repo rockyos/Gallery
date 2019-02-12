@@ -46,7 +46,6 @@ namespace CoreTest.Controllers
 
 
         [HttpPost]
-      //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(Photo model)
         {
             if (ModelState.IsValid)
@@ -60,7 +59,6 @@ namespace CoreTest.Controllers
         }
 
         [HttpPost]
-      //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int[] id)
         {
             foreach (var item in id)

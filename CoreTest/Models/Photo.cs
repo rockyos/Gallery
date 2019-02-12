@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -15,10 +16,10 @@ namespace CoreTest.Models
     {
         public int Id { get; set; }
         [NotMapped]
-        [Required(ErrorMessage = "File not selected!")]
         [DataType(DataType.Upload)]
+        [JsonIgnore]
         public List<IFormFile> FormFile { get; set; }
-
+        [JsonIgnore]
         public byte[] ImageContent { get; set; }
         public string PhotoName { get; set; }
     }

@@ -19,38 +19,44 @@ namespace CoreTest.Services
     {
         public byte[] GetImage(byte[] photobyte, int id, int width)
         {
-            Bitmap bmp;
-            MemoryStream memoryStream = new MemoryStream();
-            const long quality = 50;
-            using (var ms = new MemoryStream(photobyte))
+            if (width != 0)
             {
-                bmp = new Bitmap(ms);
-                int imageHeight = bmp.Height;
-                int imageWidth = bmp.Width;
-                if (imageWidth > width)
+                Bitmap bmp;
+                MemoryStream memoryStream = new MemoryStream();
+                const long quality = 50;
+                using (var ms = new MemoryStream(photobyte))
                 {
-                    float ratio = (float)imageWidth / (float)imageHeight;
-                    var resized_Bitmap = new Bitmap((int)width, (int)(width / ratio));
-                    using (var graphics = Graphics.FromImage(resized_Bitmap))
+                    bmp = new Bitmap(ms);
+                    int imageHeight = bmp.Height;
+                    int imageWidth = bmp.Width;
+                    if (imageWidth > width)
                     {
-                        graphics.CompositingQuality = CompositingQuality.HighSpeed;
-                        graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                        graphics.CompositingMode = CompositingMode.SourceCopy;
-                        graphics.DrawImage(bmp, 0, 0, width, width / ratio);
+                        float ratio = (float)imageWidth / (float)imageHeight;
+                        var resized_Bitmap = new Bitmap((int)width, (int)(width / ratio));
+                        using (var graphics = Graphics.FromImage(resized_Bitmap))
+                        {
+                            graphics.CompositingQuality = CompositingQuality.HighSpeed;
+                            graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                            graphics.CompositingMode = CompositingMode.SourceCopy;
+                            graphics.DrawImage(bmp, 0, 0, width, width / ratio);
 
-                        var qualityParamId = Encoder.Quality;
-                        var encoderParameters = new EncoderParameters(1);
-                        encoderParameters.Param[0] = new EncoderParameter(qualityParamId, quality);
-                        var codec = ImageCodecInfo.GetImageDecoders().FirstOrDefault(c => c.FormatID == ImageFormat.Jpeg.Guid);
-                        resized_Bitmap.Save(memoryStream, ImageFormat.Jpeg);
+                            var qualityParamId = Encoder.Quality;
+                            var encoderParameters = new EncoderParameters(1);
+                            encoderParameters.Param[0] = new EncoderParameter(qualityParamId, quality);
+                            var codec = ImageCodecInfo.GetImageDecoders().FirstOrDefault(c => c.FormatID == ImageFormat.Jpeg.Guid);
+                            resized_Bitmap.Save(memoryStream, ImageFormat.Jpeg);
+                        }
+                    }
+                    else
+                    {
+                        bmp.Save(memoryStream, ImageFormat.Jpeg);
                     }
                 }
-                else
-                {
-                    bmp.Save(memoryStream, ImageFormat.Jpeg);
-                }
+                return memoryStream.ToArray();
             }
-            return memoryStream.ToArray();
+            else {
+                return photobyte;
+            }
         }
     }
 }
