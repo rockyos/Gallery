@@ -40,8 +40,7 @@ namespace CoreTest.Controllers
         public async Task<IActionResult> GetListfromDB()
         {
             List<Photo> photos = await _repository.GetAll();
-            var json = JsonConvert.SerializeObject(photos);
-            return Json(json);
+            return Json(photos);
         }
 
 
