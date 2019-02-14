@@ -68,9 +68,14 @@ body {
 }*/
 .table {
     border: 0;
+    background-color:transparent;
 }
 
 .toclientpage {
     max-height: 480px;
     max-width: 320px;
 }
+
+/*.fixed-table-loading {
+    display:none;
+}*/
