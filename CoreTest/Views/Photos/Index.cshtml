@@ -19,9 +19,9 @@
     <div class="d-flex justify-content-end">
         <div class="btn-group" role="group">
             <span id="btn_reset" class="btn btn-outline-dark font-weight-bold">Cancel</span>
-            <button id="savebutton" class="btn btn-outline-success font-weight-bold">
+            <span id="savebutton" class="btn btn-outline-success font-weight-bold">
                 Save<img id="loaderimg" src="~/images/loaderimg.gif" />
-            </button>
+            </span>
         </div>
     </div>
 </form>
@@ -31,7 +31,6 @@
 
     <script>
         var $table = $('#imagesTable'), selections = [];
-
         $table.bootstrapTable({
             showHeader: true,
             checkboxHeader: false,
@@ -54,127 +53,69 @@
                     formatter: showDeleteButton,
                     events: {
                         'click button': function (e, value, row, index) {
-                            //deleteCollectionItem(row.id);
+                            $("#imagesTable").bootstrapTable('hideRow', { index: index });
+                            $.ajax({
+                                url: 'Photos/Delete',
+                                type: 'POST',
+                                data: { id: row.id }
+                            });;
+
                         }
                     }
                 }
             ]
         });
 
-        $('#imagesTable').on('load-success.bs.table',
-            function() {
-                $("a#single_image").fancybox();
-            });
+        $('#imagesTable').on('load-success.bs.table', function() {
+            $("a#single_image").fancybox();
+        });
 
         function showItemImage(value, row, index, field) {
             var imageRow = '<a id="single_image" href="' +
                 '@Url.Action("ImageResize", "Photos")' +
-                '/' +
-                row.id +
-                '"><img class="img-thumbnail mx-auto d-block" src="' +
+                '/' + row.id + '"><img class="img-thumbnail mx-auto d-block" src="' +
                 '@Url.Action("ImageResize", "Photos")' +
-                '/' +
-                row.id +
-                '?width=320" alt="Foto" /></a>';
-
+                '/' + row.id + '?width=320" alt="Foto" /></a>';
             return imageRow;
         }
 
         function showDeleteButton(value, row, index, field) {
-            return '<button id="' + row.id + '"type="button" >Delete</button>';
+            return '<button class="btndelete btn btn-outline-danger font-weight-bold" id="' + row.id + '"type="button" >Delete</button>';
         }
-
-        var sendfiles = [];// list of files who will be add to DB
-        var delfiles = [];// list of file who will delete from DB
 
         $(document).ready(function () {
             $('#loaderimg').hide();
             $('#btn_reset').click(function () {
-                sendfiles = [];
-                delfiles = [];
                 $('#imagesTable').bootstrapTable('getHiddenRows', true);
                 $('#imagesTable').bootstrapTable('refresh');
             });
             addNewImage();
-            buttonDelClick();
         });
 
-
-        function addNewImage() { // generation HTML for new added image and add to table
+        function addNewImage() { // add image into session
             $('input[type=file]').change(function (event) {
-                var filepath = URL.createObjectURL(event.target.files[0]);
+                event.preventDefault();
+                var file = event.target.files[0];
                 var valid = $('#post_file_form').valid();
                 if (valid) {
-                    var filenameGuid = (new Date()).getTime().toString(36);
-                    var file = { 'file': event.target.files[0], 'nameId': filenameGuid}
-                    sendfiles.push(file);
-                    var filename = event.target.files[0].name;
-                    var imgdata =
-                    {
-                        'ImageContent': '<a id="single_image" href="' + filepath +'"><img class="img-thumbnail mx-auto d-block toclientpage" src="' + filepath + '" alt="Foto" /></a>',
-                        'PhotoName': filename,
-                        'DelButton': '<button id="' + filenameGuid + '" class="btndelete btn btn-outline-danger font-weight-bold">Delete</button>'
-                    };
-                    $("#imagesTable").bootstrapTable('append', imgdata);
-                    $("a#single_image").fancybox();
+                    var formdata = new FormData();
+                    formdata.append('FormFile', file);
+                    $.ajax({
+                        type: 'POST',
+                        url: 'Photos/Index',
+                        data: formdata,
+                        processData: false,
+                        contentType: false,
+                        success: function (result) {
+                            $('#loaderimg').hide();
+                            $('#imagesTable').bootstrapTable('refresh');
+                        },
+                        error: function (error) {
+                            $('#loaderimg').hide();
+                        }
+                    });
                 }
             });
         }
-
-        function sendImageDelete(delfiles) {
-            $.ajax({
-                url: 'Photos/Delete',
-                type: 'POST',
-                data: { id: delfiles }
-            });
-        };
-
-        function buttonDelClick() { // delete button click
-            $(document).on("click", ".btndelete", function () {
-                var id = $(this).attr('id');
-                $(sendfiles).each(function (index) {// delete file from list to send on server(SAVE)
-                    if (sendfiles[index].nameId === id) {
-                        sendfiles.splice(index, 1);
-                    }
-                })
-                var rowindex = $(this).closest('tr').data('index');//get data-index and hidden deleted row
-                $("#imagesTable").bootstrapTable('hideRow', {
-                    index: rowindex
-                });
-                delfiles.push(id);
-            });
-        }
-
-        $(document).on('submit', '#post_file_form', function (event) {
-            event.preventDefault();
-            var formdata = new FormData();
-            if (sendfiles.length > 0) {
-                $('#loaderimg').show();
-                $(sendfiles).each(function (index) {
-                    formdata.append('FormFile', sendfiles[index].file);
-                });
-                $.ajax({
-                    type: 'POST',
-                    url: 'Photos/Index',
-                    data: formdata,
-                    processData: false,
-                    contentType: false,
-                    success: function (result) {
-                        $('#loaderimg').hide();
-                        $('#imagesTable').bootstrapTable('refresh');
-                        sendfiles = [];
-                    },
-                    error: function (error) {
-                        $('#loaderimg').hide();
-                    }
-                });
-            }
-            if (delfiles.length > 0) {
-                sendImageDelete(delfiles);
-                delfiles = [];
-            }
-        });
     </script>
 }
-
-

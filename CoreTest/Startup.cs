@@ -32,6 +32,10 @@ namespace CoreTest
             services.AddDbContext<PhotoContext>(options =>
                 options.UseSqlServer(conn));
 
+
+            services.AddDistributedMemoryCache(); // IDistributedCache
+            services.AddSession();
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -63,6 +67,7 @@ namespace CoreTest
                 app.UseHsts();
             }
 
+            app.UseSession();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
