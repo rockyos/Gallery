@@ -19,7 +19,7 @@ namespace CoreTest.Models
         [DataType(DataType.Upload)]
         [JsonIgnore]
         public List<IFormFile> FormFile { get; set; }
-        [JsonIgnore]
+        //[JsonIgnore]
         public byte[] ImageContent { get; set; }
         public string PhotoName { get; set; }
     }
