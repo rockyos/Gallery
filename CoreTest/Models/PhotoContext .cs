@@ -14,8 +14,8 @@ namespace CoreTest.Models
         public PhotoContext(DbContextOptions<PhotoContext> options) : base(options)
         {
             Database.EnsureCreated();
-            //Database.Migrate();
         }
         public DbSet<Photo> Photos { get; set; }
-    }   
+    }
+
 }

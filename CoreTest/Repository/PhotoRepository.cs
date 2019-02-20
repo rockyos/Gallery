@@ -10,7 +10,7 @@ namespace CoreTest.Repository
     public interface IRepository
     {
         Task<List<Photo>> GetAll();
-        Task<Photo> GetOne(int id);
+        Task<Photo> GetOne(string guid);
         void Add(Photo item);
         void Remove(Photo item);
         Task SaveChanges();
@@ -28,8 +28,8 @@ namespace CoreTest.Repository
         public Task<List<Photo>> GetAll() =>
             _context.Photos.ToListAsync();
 
-        public Task<Photo> GetOne(int id) =>
-                _context.Photos.SingleOrDefaultAsync(m => m.Id == id);
+        public Task<Photo> GetOne(string guid) =>
+                _context.Photos.SingleOrDefaultAsync(m => m.Guid == guid);
 
         public void Add(Photo item) =>
             _context.Photos.Add(item);

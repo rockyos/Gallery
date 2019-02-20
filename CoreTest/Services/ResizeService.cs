@@ -12,12 +12,12 @@ namespace CoreTest.Services
 {
     public interface IResizeService
     {
-        byte[] GetImage(byte[] photobyte, int id, int width);
+        byte[] GetImage(byte[] photobyte, int width);
     }
 
     public class ResizeService : IResizeService
     {
-        public byte[] GetImage(byte[] photobyte, int id, int width)
+        public byte[] GetImage(byte[] photobyte, int width)
         {
             if (width != 0)
             {

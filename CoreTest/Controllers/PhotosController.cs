@@ -25,28 +25,25 @@ namespace CoreTest.Controllers
         }
 
        //[ResponseCache(Location = ResponseCacheLocation.Any, Duration = 300)]
-        public async Task<IActionResult> ImageResize(int id, int width)
+        public async Task<IActionResult> ImageResize(string id, int width)
         {
             Photo photo = new Photo();
-            if (id > 999)
-            {
-                photo = await _repository.GetOne(id);
-            }
-            else
+            photo = await _repository.GetOne(id);
+            if(photo == null)
             {
                 var datasession = HttpContext.Session.GetString(sessionkey);
                 List<Photo> photosfromsession = JsonConvert.DeserializeObject<List<Photo>>(datasession);
                 foreach (var item in photosfromsession)
                 {
-                    if(item.Id == id)
+                    if (item.Guid == id)
                     {
                         photo = item;
                         break;
                     }
                 }
             }
-           
-            byte[] resizedImage = _resizer.GetImage(photo.ImageContent, id, width);
+
+            byte[] resizedImage = _resizer.GetImage(photo.ImageContent, width);
             return new FileContentResult(resizedImage, "binary/octet-stream");
         }
 
@@ -81,15 +78,14 @@ namespace CoreTest.Controllers
                 List<Photo> photosfromsession = JsonConvert.DeserializeObject<List<Photo>>(datasession);
                 foreach (var item in photosfromsession)
                 {
-                    if (item.Id > 999)
+                    Photo photo = await _repository.GetOne(item.Guid);
+                    if (photo != null)
                     {
-                        _repository.Remove(item);
-                    } else
-                    {
+                        _repository.Remove(photo);
+                    } else {
                         item.Id = 0;
                         _repository.Add(item);
                     }
-                    //await _repository.SaveChanges();
                 }
                 await _repository.SaveChanges();
                 HttpContext.Session.Clear();
@@ -116,22 +112,13 @@ namespace CoreTest.Controllers
                     byte[]  img = reader.ReadBytes((int)model.FormFile[0].Length);
                     photolist.PhotoName = model.FormFile[0].FileName;
                     photolist.ImageContent = img;
+                    photolist.Guid = Guid.NewGuid().ToString();
                 }
 
                 if (datasession != null)
                 {
                     List<Photo> photosfromsession = JsonConvert.DeserializeObject<List<Photo>>(datasession);
-                    int idmax = 0;
-                    foreach (var item in photosfromsession)
-                    {
-                        if(item.Id > idmax & item.Id < 1000)
-                        {
-                            idmax = item.Id;
-                        }
-                    }
-                    photolist.Id = ++idmax;
                     photosfromsession.Add(photolist);
-
                     var serialisedDate = JsonConvert.SerializeObject(photosfromsession);
                     HttpContext.Session.SetString(sessionkey, serialisedDate);
                 } else
@@ -144,7 +131,7 @@ namespace CoreTest.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(string guid)
         {
             var datasession = HttpContext.Session.GetString(sessionkey);
             List<Photo> photosfromsession = new List<Photo>();
@@ -152,15 +139,17 @@ namespace CoreTest.Controllers
             {
                 photosfromsession = JsonConvert.DeserializeObject<List<Photo>>(datasession);
             }
-            if (id > 999)
+            Photo photo = new Photo();
+            photo = await _repository.GetOne(guid);
+
+            if (photo != null)
             {
-                Photo photo = await _repository.GetOne(id);
                 photosfromsession.Add(photo);
             } else
             {
                 foreach (var item in photosfromsession)
                 {
-                    if(item.Id == id)
+                    if(item.Guid == guid)
                     {
                         photosfromsession.Remove(item);
                         break;

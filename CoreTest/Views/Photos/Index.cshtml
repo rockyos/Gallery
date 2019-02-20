@@ -57,7 +57,7 @@
                             $.ajax({
                                 url: 'Photos/Delete',
                                 type: 'POST',
-                                data: { id: row.id }
+                                data: { guid: row.guid }
                             });;
 
                         }
@@ -73,14 +73,14 @@
         function showItemImage(value, row, index, field) {
             var imageRow = '<a id="single_image" href="' +
                 '@Url.Action("ImageResize", "Photos")' +
-                '/' + row.id + '"><img class="img-thumbnail mx-auto d-block" src="' +
+                '/' + row.guid + '"><img class="img-thumbnail mx-auto d-block" src="' +
                 '@Url.Action("ImageResize", "Photos")' +
-                '/' + row.id + '?width=320" alt="Foto" /></a>';
+                '/' + row.guid + '?width=320" alt="Foto" /></a>';
             return imageRow;
         }
 
         function showDeleteButton(value, row, index, field) {
-            return '<button class="btndelete btn btn-outline-danger font-weight-bold" id="' + row.id + '"type="button" >Delete</button>';
+            return '<button class="btndelete btn btn-outline-danger font-weight-bold" id="' + row.guid + '"type="button" >Delete</button>';
         }
 
         $(document).ready(function () {
