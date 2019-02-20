@@ -66,6 +66,10 @@ namespace CoreTest.Controllers
                 List<Photo> photosfromsession = JsonConvert.DeserializeObject<List<Photo>>(datasession);
                 photos.AddRange(photosfromsession);
             }
+            foreach (var item in photos)
+            {
+                item.ImageContent = null;
+            }
             return Json(photos);
         }
 
@@ -80,11 +84,12 @@ namespace CoreTest.Controllers
                     if (item.Id > 999)
                     {
                         _repository.Remove(item);
-                    }else
+                    } else
                     {
+                        item.Id = 0;
                         _repository.Add(item);
                     }
-                   // await _repository.SaveChanges();
+                    //await _repository.SaveChanges();
                 }
                 await _repository.SaveChanges();
                 HttpContext.Session.Clear();
@@ -119,7 +124,7 @@ namespace CoreTest.Controllers
                     int idmax = 0;
                     foreach (var item in photosfromsession)
                     {
-                        if(item.Id > idmax)
+                        if(item.Id > idmax & item.Id < 1000)
                         {
                             idmax = item.Id;
                         }
