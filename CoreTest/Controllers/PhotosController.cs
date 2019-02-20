@@ -24,7 +24,7 @@ namespace CoreTest.Controllers
             _photolistService = photolistService;
         }
 
-        [ResponseCache(Location = ResponseCacheLocation.Any, Duration = 300)]
+       //[ResponseCache(Location = ResponseCacheLocation.Any, Duration = 300)]
         public async Task<IActionResult> ImageResize(int id, int width)
         {
             Photo photo = new Photo();
@@ -38,7 +38,7 @@ namespace CoreTest.Controllers
                 List<Photo> photosfromsession = JsonConvert.DeserializeObject<List<Photo>>(datasession);
                 foreach (var item in photosfromsession)
                 {
-                    if(photosfromsession.IndexOf(item) == id)
+                    if(item.Id == id)
                     {
                         photo = item;
                         break;
@@ -69,38 +69,69 @@ namespace CoreTest.Controllers
             return Json(photos);
         }
 
+        public async Task<IActionResult> SavePhoto()
+        {
+            var datasession = HttpContext.Session.GetString(sessionkey);
+            if (datasession != null)
+            {
+                List<Photo> photosfromsession = JsonConvert.DeserializeObject<List<Photo>>(datasession);
+                foreach (var item in photosfromsession)
+                {
+                    if (item.Id > 999)
+                    {
+                        _repository.Remove(item);
+                    }else
+                    {
+                        _repository.Add(item);
+                    }
+                   // await _repository.SaveChanges();
+                }
+                await _repository.SaveChanges();
+                HttpContext.Session.Clear();
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Reset()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction(nameof(Index));
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> Index(Photo model)
         {
             if (ModelState.IsValid)
             {
-                List<Photo> photolist = new List<Photo>();
-                foreach (var item in model.FormFile)
-                {
-                    byte[] img;
-                    using (var reader = new BinaryReader(item.OpenReadStream()))
-                    {
-                        img = reader.ReadBytes((int)item.Length);
-                    }
-                    photolist.Add(new Photo { PhotoName = item.FileName, ImageContent = img });
-                }
-
                 var datasession = HttpContext.Session.GetString(sessionkey);
+                Photo photolist = new Photo();
+                using (var reader = new BinaryReader(model.FormFile[0].OpenReadStream()))
+                {
+                    byte[]  img = reader.ReadBytes((int)model.FormFile[0].Length);
+                    photolist.PhotoName = model.FormFile[0].FileName;
+                    photolist.ImageContent = img;
+                }
 
                 if (datasession != null)
                 {
                     List<Photo> photosfromsession = JsonConvert.DeserializeObject<List<Photo>>(datasession);
-                    photosfromsession.AddRange(photolist);
+                    int idmax = 0;
                     foreach (var item in photosfromsession)
                     {
-                        item.Id = photosfromsession.IndexOf(item);
+                        if(item.Id > idmax)
+                        {
+                            idmax = item.Id;
+                        }
                     }
+                    photolist.Id = ++idmax;
+                    photosfromsession.Add(photolist);
+
                     var serialisedDate = JsonConvert.SerializeObject(photosfromsession);
                     HttpContext.Session.SetString(sessionkey, serialisedDate);
                 } else
-                {
-                    var serialisedDate = JsonConvert.SerializeObject(photolist);
+                {      
+                    var serialisedDate = JsonConvert.SerializeObject(new List<Photo>(){photolist});
                     HttpContext.Session.SetString(sessionkey, serialisedDate);
                 }
             }
@@ -111,32 +142,28 @@ namespace CoreTest.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var datasession = HttpContext.Session.GetString(sessionkey);
-            List<Photo> photosfromsession = JsonConvert.DeserializeObject<List<Photo>>(datasession);
+            List<Photo> photosfromsession = new List<Photo>();
+            if (datasession != null)
+            {
+                photosfromsession = JsonConvert.DeserializeObject<List<Photo>>(datasession);
+            }
             if (id > 999)
             {
                 Photo photo = await _repository.GetOne(id);
                 photosfromsession.Add(photo);
-            }
-            else
+            } else
             {
                 foreach (var item in photosfromsession)
                 {
-                    if(photosfromsession.IndexOf(item) == id)
+                    if(item.Id == id)
                     {
-                        photosfromsession.RemoveAt(id);
+                        photosfromsession.Remove(item);
                         break;
                     }
-                }
-                var serialisedDate = JsonConvert.SerializeObject(photosfromsession);
-                HttpContext.Session.SetString(sessionkey, serialisedDate);
+                }             
             }
-
-            //foreach (var item in id)
-            //{
-            //    var photo = await _repository.GetOne(item);
-            //    _repository.Remove(photo);
-            //    await _repository.SaveChanges();
-            //}
+            var serialisedDate = JsonConvert.SerializeObject(photosfromsession);
+            HttpContext.Session.SetString(sessionkey, serialisedDate);
             return RedirectToAction(nameof(Index));
         }
     }

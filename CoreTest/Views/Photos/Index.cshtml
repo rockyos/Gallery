@@ -19,7 +19,7 @@
     <div class="d-flex justify-content-end">
         <div class="btn-group" role="group">
             <span id="btn_reset" class="btn btn-outline-dark font-weight-bold">Cancel</span>
-            <span id="savebutton" class="btn btn-outline-success font-weight-bold">
+            <span id="save_button" class="btn btn-outline-success font-weight-bold">
                 Save<img id="loaderimg" src="~/images/loaderimg.gif" />
             </span>
         </div>
@@ -34,6 +34,7 @@
         $table.bootstrapTable({
             showHeader: true,
             checkboxHeader: false,
+            sortable: false,
             undefinedText: '',
             formatNoMatches: function() {
                 return 'No Items';
@@ -46,7 +47,6 @@
                 {
                     field: 'photoName',
                     sortable: true,
-                    title: 'Image Name'
                 },
                 {
                     title: '',
@@ -86,11 +86,24 @@
         $(document).ready(function () {
             $('#loaderimg').hide();
             $('#btn_reset').click(function () {
-                $('#imagesTable').bootstrapTable('getHiddenRows', true);
-                $('#imagesTable').bootstrapTable('refresh');
+                saveAndResetBtn('Photos/Reset')
+            });
+            $('#save_button').click(function () {
+                saveAndResetBtn('Photos/SavePhoto')
             });
             addNewImage();
         });
+
+        function saveAndResetBtn(path) {
+            $.ajax({
+                type: 'POST',
+                url: path,
+                success: function () {
+                    $('#imagesTable').bootstrapTable('getHiddenRows', true);
+                    $('#imagesTable').bootstrapTable('refresh');
+                },
+            });
+        }
 
         function addNewImage() { // add image into session
             $('input[type=file]').change(function (event) {
