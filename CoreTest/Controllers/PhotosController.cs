@@ -18,12 +18,14 @@ namespace CoreTest.Controllers
         readonly IResizeService _resizer;
         readonly IPhotolistService _photolistService;
         readonly IGetPhotoService _getPhotoService;
-        public PhotosController(IRepository repository, IResizeService resizer, IPhotolistService photolistService, IGetPhotoService getPhotoService) 
+        readonly IIndexService _indexService;
+        public PhotosController(IRepository repository, IResizeService resizer, IPhotolistService photolistService, IGetPhotoService getPhotoService, IIndexService getindexService) 
         {
             _repository = repository;
             _resizer = resizer;
             _photolistService = photolistService;
             _getPhotoService = getPhotoService;
+            _indexService = getindexService;
         }
 
        //[ResponseCache(Location = ResponseCacheLocation.Any, Duration = 300)]
@@ -86,26 +88,8 @@ namespace CoreTest.Controllers
             if (ModelState.IsValid)
             {
                 var datasession = HttpContext.Session.GetString(sessionkey);
-                Photo photolist = new Photo();
-                using (var reader = new BinaryReader(model.FormFile[0].OpenReadStream()))
-                {
-                    byte[]  img = reader.ReadBytes((int)model.FormFile[0].Length);
-                    photolist.PhotoName = model.FormFile[0].FileName;
-                    photolist.ImageContent = img;
-                    photolist.Guid = Guid.NewGuid().ToString();
-                }
-
-                if (datasession != null)
-                {
-                    List<Photo> photosfromsession = JsonConvert.DeserializeObject<List<Photo>>(datasession);
-                    photosfromsession.Add(photolist);
-                    var serialisedDate = JsonConvert.SerializeObject(photosfromsession);
-                    HttpContext.Session.SetString(sessionkey, serialisedDate);
-                } else
-                {      
-                    var serialisedDate = JsonConvert.SerializeObject(new List<Photo>(){photolist});
-                    HttpContext.Session.SetString(sessionkey, serialisedDate);
-                }
+                string data = _indexService.GetIndexService(model, datasession);
+                HttpContext.Session.SetString(sessionkey, data);
             }
             return RedirectToAction(nameof(Index));
         }

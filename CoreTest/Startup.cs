@@ -50,6 +50,7 @@ namespace CoreTest
             services.AddScoped<IResizeService, ResizeService>();
             services.AddScoped<IPhotolistService, PhotolistService>();
             services.AddScoped<IGetPhotoService, GetPhotoService>();
+            services.AddScoped<IIndexService, IndexService>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddViewOptions(options =>
