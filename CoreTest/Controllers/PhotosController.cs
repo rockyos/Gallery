@@ -19,13 +19,16 @@ namespace CoreTest.Controllers
         readonly IPhotolistService _photolistService;
         readonly IGetPhotoService _getPhotoService;
         readonly IIndexService _indexService;
-        public PhotosController(IRepository repository, IResizeService resizer, IPhotolistService photolistService, IGetPhotoService getPhotoService, IIndexService getindexService) 
+        readonly ISavePhotoService _savePhotoService;
+        public PhotosController(IRepository repository, IResizeService resizer, ISavePhotoService savePhotoService,
+            IPhotolistService photolistService, IGetPhotoService getPhotoService, IIndexService getindexService) 
         {
             _repository = repository;
             _resizer = resizer;
             _photolistService = photolistService;
             _getPhotoService = getPhotoService;
             _indexService = getindexService;
+            _savePhotoService = savePhotoService;
         }
 
        //[ResponseCache(Location = ResponseCacheLocation.Any, Duration = 300)]
@@ -55,23 +58,8 @@ namespace CoreTest.Controllers
         public async Task<IActionResult> SavePhoto()
         {
             var datasession = HttpContext.Session.GetString(sessionkey);
-            if (datasession != null)
-            {
-                List<Photo> photosfromsession = JsonConvert.DeserializeObject<List<Photo>>(datasession);
-                foreach (var item in photosfromsession)
-                {
-                    Photo photo = await _repository.GetOne(item.Guid);
-                    if (photo != null)
-                    {
-                        _repository.Remove(photo);
-                    } else {
-                        item.Id = 0;
-                        _repository.Add(item);
-                    }
-                }
-                await _repository.SaveChanges();
-                HttpContext.Session.Clear();
-            }
+            await _savePhotoService.SavePhotoAsync(datasession, _repository);
+            HttpContext.Session.Clear();
             return RedirectToAction(nameof(Index));
         }
 
