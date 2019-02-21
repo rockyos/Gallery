@@ -7,8 +7,12 @@ using System.Threading.Tasks;
 
 namespace CoreTest.Services
 {
+    public interface IGetPhotoService
+    {
+        List<Photo> GetPhotoDBandSession(List<Photo> photo, string datasession);
+    }
 
-    public class GetPhotoService 
+    public class GetPhotoService : IGetPhotoService
     {
         public List<Photo> GetPhotoDBandSession(List<Photo> photo, string datasession)
         {
