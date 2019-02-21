@@ -18,11 +18,12 @@ namespace CoreTest.Controllers
         readonly IResizeService _resizer;
         readonly IPhotolistService _photolistService;
         readonly IGetPhotoService _getPhotoService;
-        public PhotosController(IRepository repository, IResizeService resizer, IPhotolistService photolistService) 
+        public PhotosController(IRepository repository, IResizeService resizer, IPhotolistService photolistService, IGetPhotoService getPhotoService) 
         {
             _repository = repository;
             _resizer = resizer;
             _photolistService = photolistService;
+            _getPhotoService = getPhotoService;
         }
 
        //[ResponseCache(Location = ResponseCacheLocation.Any, Duration = 300)]
