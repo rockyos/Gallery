@@ -20,8 +20,9 @@ namespace CoreTest.Controllers
         readonly IGetPhotoService _getPhotoService;
         readonly IIndexService _indexService;
         readonly ISavePhotoService _savePhotoService;
+        readonly IDeleteService _deleteService;
         public PhotosController(IRepository repository, IResizeService resizer, ISavePhotoService savePhotoService,
-            IPhotolistService photolistService, IGetPhotoService getPhotoService, IIndexService getindexService) 
+            IPhotolistService photolistService, IGetPhotoService getPhotoService, IIndexService getindexService, IDeleteService deleteService) 
         {
             _repository = repository;
             _resizer = resizer;
@@ -29,6 +30,7 @@ namespace CoreTest.Controllers
             _getPhotoService = getPhotoService;
             _indexService = getindexService;
             _savePhotoService = savePhotoService;
+            _deleteService = deleteService;
         }
 
        //[ResponseCache(Location = ResponseCacheLocation.Any, Duration = 300)]
@@ -86,30 +88,8 @@ namespace CoreTest.Controllers
         public async Task<IActionResult> Delete(string guid)
         {
             var datasession = HttpContext.Session.GetString(sessionkey);
-            List<Photo> photosfromsession = new List<Photo>();
-            if (datasession != null)
-            {
-                photosfromsession = JsonConvert.DeserializeObject<List<Photo>>(datasession);
-            }
-            Photo photo = new Photo();
-            photo = await _repository.GetOne(guid);
-
-            if (photo != null)
-            {
-                photosfromsession.Add(photo);
-            } else
-            {
-                foreach (var item in photosfromsession)
-                {
-                    if(item.Guid == guid)
-                    {
-                        photosfromsession.Remove(item);
-                        break;
-                    }
-                }             
-            }
-            var serialisedDate = JsonConvert.SerializeObject(photosfromsession);
-            HttpContext.Session.SetString(sessionkey, serialisedDate);
+            var data = await _deleteService.DeleteAsync(guid, datasession, _repository);
+            HttpContext.Session.SetString(sessionkey, data);
             return RedirectToAction(nameof(Index));
         }
     }
