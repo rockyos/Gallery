@@ -26,7 +26,12 @@ namespace CoreTest.Repository
         }
 
         public Task<List<Photo>> GetAll() =>
-            _context.Photos.ToListAsync();
+            _context.Photos.Select(x => new Photo()
+            {
+                Guid = x.Guid,
+                PhotoName = x.PhotoName,
+                Id = x.Id
+            }).ToListAsync();
 
         public Task<Photo> GetOne(string guid) =>
                 _context.Photos.SingleOrDefaultAsync(m => m.Guid == guid);

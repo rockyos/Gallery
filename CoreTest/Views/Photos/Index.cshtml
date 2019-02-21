@@ -53,11 +53,13 @@
                     formatter: showDeleteButton,
                     events: {
                         'click button': function (e, value, row, index) {
-                            $("#imagesTable").bootstrapTable('hideRow', { index: index });
                             $.ajax({
                                 url: 'Photos/Delete',
                                 type: 'POST',
-                                data: { guid: row.guid }
+                                data: { guid: row.guid },
+                                success: function () {
+                                   $("#imagesTable").bootstrapTable('hideRow', { index: index });
+                                },
                             });;
 
                         }
@@ -65,6 +67,7 @@
                 }
             ]
         });
+
 
         $('#imagesTable').on('load-success.bs.table', function() {
             $("a#single_image").fancybox();

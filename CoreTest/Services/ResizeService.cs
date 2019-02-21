@@ -1,4 +1,5 @@
 ﻿using CoreTest.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -12,19 +13,32 @@ namespace CoreTest.Services
 {
     public interface IResizeService
     {
-        byte[] GetImage(byte[] photobyte, int width);
+        byte[] GetImage(Photo photo, string datasession, string id, int width);
     }
 
     public class ResizeService : IResizeService
     {
-        public byte[] GetImage(byte[] photobyte, int width)
+        public byte[] GetImage(Photo photo, string datasession, string id, int width)
         {
+            if (photo == null)
+            {
+                List<Photo> photosfromsession = JsonConvert.DeserializeObject<List<Photo>>(datasession);
+                foreach (var item in photosfromsession)
+                {
+                    if (item.Guid == id)
+                    {
+                        photo = item;
+                        break;
+                    }
+                }
+            }
+
             if (width != 0)
             {
                 Bitmap bmp;
                 MemoryStream memoryStream = new MemoryStream();
                 const long quality = 50;
-                using (var ms = new MemoryStream(photobyte))
+                using (var ms = new MemoryStream(photo.ImageContent))
                 {
                     bmp = new Bitmap(ms);
                     int imageHeight = bmp.Height;
@@ -55,7 +69,7 @@ namespace CoreTest.Services
                 return memoryStream.ToArray();
             }
             else {
-                return photobyte;
+                return photo.ImageContent;
             }
         }
     }

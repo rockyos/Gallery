@@ -17,6 +17,7 @@ namespace CoreTest.Controllers
         readonly IRepository _repository;
         readonly IResizeService _resizer;
         readonly IPhotolistService _photolistService;
+        readonly IGetPhotoService _getPhotoService;
         public PhotosController(IRepository repository, IResizeService resizer, IPhotolistService photolistService) 
         {
             _repository = repository;
@@ -27,23 +28,9 @@ namespace CoreTest.Controllers
        //[ResponseCache(Location = ResponseCacheLocation.Any, Duration = 300)]
         public async Task<IActionResult> ImageResize(string id, int width)
         {
-            Photo photo = new Photo();
-            photo = await _repository.GetOne(id);
-            if(photo == null)
-            {
-                var datasession = HttpContext.Session.GetString(sessionkey);
-                List<Photo> photosfromsession = JsonConvert.DeserializeObject<List<Photo>>(datasession);
-                foreach (var item in photosfromsession)
-                {
-                    if (item.Guid == id)
-                    {
-                        photo = item;
-                        break;
-                    }
-                }
-            }
-
-            byte[] resizedImage = _resizer.GetImage(photo.ImageContent, width);
+            Photo photo = await _repository.GetOne(id);
+            var datasession = HttpContext.Session.GetString(sessionkey);
+            byte[] resizedImage = _resizer.GetImage(photo, datasession, id, width);
             return new FileContentResult(resizedImage, "binary/octet-stream");
         }
 
@@ -56,17 +43,9 @@ namespace CoreTest.Controllers
 
         public async Task<IActionResult> GetListfromDB()
         {
-            List<Photo> photos = await _repository.GetAll();
-            var datasession = HttpContext.Session.GetString(sessionkey);         
-            if(datasession != null)
-            {
-                List<Photo> photosfromsession = JsonConvert.DeserializeObject<List<Photo>>(datasession);
-                photos.AddRange(photosfromsession);
-            }
-            foreach (var item in photos)
-            {
-                item.ImageContent = null;
-            }
+            List<Photo> photo = await _repository.GetAll();
+            var datasession = HttpContext.Session.GetString(sessionkey);
+            var photos = _getPhotoService.GetPhotoDBandSession(photo, datasession);
             return Json(photos);
         }
 
