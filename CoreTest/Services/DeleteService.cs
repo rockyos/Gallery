@@ -17,12 +17,16 @@ namespace CoreTest.Services
     {
         public async Task<List<Photo>> DeleteAsync(string guid, List<Photo> photos, IRepository _repository)
         {
+            //photos = new List<Photo>();
             Photo photo = await _repository.GetOne(guid);
             if (photo != null)
             {
+                if(photos == null)
+                {
+                    photos = new List<Photo>();
+                }
                 photos.Add(photo);
-            }
-            else
+            } else
             {
                 foreach (var item in photos)
                 {
@@ -33,7 +37,6 @@ namespace CoreTest.Services
                     }
                 }
             }
-
             return photos;
         }
     }

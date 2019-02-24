@@ -11,12 +11,12 @@ namespace CoreTest.Services
 {
     public interface IIndexService
     {
-        string GetIndexService(Photo photo, string datasession);
+        List<Photo> GetIndexService(Photo photo, List<Photo> datasession);
     }
 
     public class IndexService : IIndexService
     {
-        public string GetIndexService(Photo photo, string datasession)
+        public List<Photo> GetIndexService(Photo photo, List<Photo> photosfromsession)
         {
             Photo photolist = new Photo();
             using (var reader = new BinaryReader(photo.FormFile[0].OpenReadStream()))
@@ -27,17 +27,14 @@ namespace CoreTest.Services
                 photolist.Guid = Guid.NewGuid().ToString();
             }
 
-            if (datasession != null)
+            if (photosfromsession != null)
             {
-                List<Photo> photosfromsession = JsonConvert.DeserializeObject<List<Photo>>(datasession);
                 photosfromsession.Add(photolist);
-                var serialisedDate = JsonConvert.SerializeObject(photosfromsession);
-                return serialisedDate;
+                return photosfromsession;
             }
             else
             {
-                var serialisedDate = JsonConvert.SerializeObject(new List<Photo>() { photolist });
-                return serialisedDate;
+                return new List<Photo>() { photolist };
             }
         }
     }

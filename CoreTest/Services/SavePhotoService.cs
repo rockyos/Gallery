@@ -10,16 +10,15 @@ namespace CoreTest.Services
 {
     public interface ISavePhotoService
     {
-        Task SavePhotoAsync(string datasession, IRepository _repository);
+        Task SavePhotoAsync(List<Photo> photosfromsession, IRepository _repository);
     }
 
     public class SavePhotoService : ISavePhotoService
     {
-        public async Task SavePhotoAsync(string datasession, IRepository _repository)
+        public async Task SavePhotoAsync(List<Photo> photosfromsession, IRepository _repository)
         {
-            if (datasession != null)
+            if (photosfromsession != null)
             {
-                List<Photo> photosfromsession = JsonConvert.DeserializeObject<List<Photo>>(datasession);
                 foreach (var item in photosfromsession)
                 {
                     Photo photo = await _repository.GetOne(item.Guid);

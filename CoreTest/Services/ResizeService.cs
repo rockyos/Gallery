@@ -13,16 +13,15 @@ namespace CoreTest.Services
 {
     public interface IResizeService
     {
-        byte[] GetImage(Photo photo, string datasession, string id, int width);
+        byte[] GetImage(Photo photo, List<Photo> photosfromsession, string id, int width);
     }
 
     public class ResizeService : IResizeService
     {
-        public byte[] GetImage(Photo photo, string datasession, string id, int width)
+        public byte[] GetImage(Photo photo, List<Photo> photosfromsession, string id, int width)
         {
             if (photo == null)
             {
-                List<Photo> photosfromsession = JsonConvert.DeserializeObject<List<Photo>>(datasession);
                 foreach (var item in photosfromsession)
                 {
                     if (item.Guid == id)

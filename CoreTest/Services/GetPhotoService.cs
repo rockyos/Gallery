@@ -9,16 +9,15 @@ namespace CoreTest.Services
 {
     public interface IGetPhotoService
     {
-        List<Photo> GetPhotoDBandSession(List<Photo> photo, string datasession);
+        List<Photo> GetPhotoDBandSession(List<Photo> photo, List<Photo> datasession);
     }
 
     public class GetPhotoService : IGetPhotoService
     {
-        public List<Photo> GetPhotoDBandSession(List<Photo> photo, string datasession)
+        public List<Photo> GetPhotoDBandSession(List<Photo> photo, List<Photo> photosfromsession)
         {
-            if (datasession != null)
+            if (photosfromsession != null)
             {
-                List<Photo> photosfromsession = JsonConvert.DeserializeObject<List<Photo>>(datasession);
                 foreach (var item in photosfromsession)
                 {
                     item.ImageContent = null;

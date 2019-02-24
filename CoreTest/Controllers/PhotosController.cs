@@ -41,8 +41,8 @@ namespace CoreTest.Controllers
         public async Task<IActionResult> ImageResize(string id, int width)
         {
             Photo photo = await _repository.GetOne(id);
-            var datasession = Session.GetString(sessionkey);
-            byte[] resizedImage = _resizer.GetImage(photo, datasession, id, width);
+            List<Photo> sessionPhotos = Session.Get<List<Photo>>(sessionkey);
+            byte[] resizedImage = _resizer.GetImage(photo, sessionPhotos, id, width);
             return new FileContentResult(resizedImage, "binary/octet-stream");
         }
 
@@ -55,16 +55,16 @@ namespace CoreTest.Controllers
 
         public async Task<IActionResult> GetListfromDB()
         {
-            List<Photo> photo = await _repository.GetAll();
-            var datasession = Session.GetString(sessionkey);
-            var photos = _getPhotoService.GetPhotoDBandSession(photo, datasession);
+            List<Photo> photoFromDB = await _repository.GetAll();
+            List<Photo> sessionPhotos = Session.Get<List<Photo>>(sessionkey);
+            List<Photo> photos = _getPhotoService.GetPhotoDBandSession(photoFromDB, sessionPhotos);
             return Json(photos);
         }
 
         public async Task<IActionResult> SavePhoto()
         {
-            var datasession = Session.GetString(sessionkey);
-            await _savePhotoService.SavePhotoAsync(datasession, _repository);
+            List<Photo> sessionPhotos = Session.Get<List<Photo>>(sessionkey);
+            await _savePhotoService.SavePhotoAsync(sessionPhotos, _repository);
             HttpContext.Session.Clear();
             return RedirectToAction(nameof(Index));
         }
@@ -81,9 +81,9 @@ namespace CoreTest.Controllers
         {
             if (ModelState.IsValid)
             {
-                var datasession = Session.GetString(sessionkey);
-                string data = _indexService.GetIndexService(model, datasession);
-                Session.SetString(sessionkey, data);
+                List<Photo> sessionPhotos = Session.Get<List<Photo>>(sessionkey);
+                List<Photo> data = _indexService.GetIndexService(model, sessionPhotos);
+                Session.Set(sessionkey, data);
             }
             return RedirectToAction(nameof(Index));
         }
@@ -91,8 +91,8 @@ namespace CoreTest.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(string guid)
         {
-            var sessionPhotos = Session.Get<List<Photo>>(sessionkey);
-            var data = await _deleteService.DeleteAsync(guid, sessionPhotos, _repository);
+            List<Photo> sessionPhotos = Session.Get<List<Photo>>(sessionkey);
+            List<Photo> data = await _deleteService.DeleteAsync(guid, sessionPhotos, _repository);
             Session.Set(sessionkey, data);
             return RedirectToAction(nameof(Index));
         }
