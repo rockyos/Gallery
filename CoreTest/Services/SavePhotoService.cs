@@ -10,29 +10,29 @@ namespace CoreTest.Services
 {
     public interface ISavePhotoService
     {
-        Task SavePhotoAsync(List<Photo> photosfromsession, IRepository _repository);
+        Task SavePhotoAsync(List<Photo> photosfromsession, IRepository<Photo> repository, IUnitOfWork unitOfWork);
     }
 
     public class SavePhotoService : ISavePhotoService
     {
-        public async Task SavePhotoAsync(List<Photo> photosfromsession, IRepository _repository)
+        public async Task SavePhotoAsync(List<Photo> photosfromsession, IRepository<Photo> repository, IUnitOfWork unitOfWork)
         {
             if (photosfromsession != null)
             {
                 foreach (var item in photosfromsession)
                 {
-                    Photo photo = await _repository.GetOne(item.Guid);
+                    Photo photo = await repository.GetOne(m => m.Guid == item.Guid);
                     if (photo != null)
                     {
-                        _repository.Remove(photo);
+                        repository.Remove(photo);
                     }
                     else
                     {
                         item.Id = 0;
-                        _repository.Add(item);
+                        repository.Add(item);
                     }
                 }
-                await _repository.SaveChanges();
+                unitOfWork.SaveToDB();
             }
         }
     }

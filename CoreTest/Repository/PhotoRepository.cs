@@ -1,4 +1,4 @@
-﻿using CoreTest.Models;
+﻿ using CoreTest.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -7,42 +7,46 @@ using System.Threading.Tasks;
 
 namespace CoreTest.Repository
 {
-    public interface IRepository
+    public interface IRepository<T> where T : class
     {
-        Task<List<Photo>> GetAll();
-        Task<Photo> GetOne(string guid);
-        void Add(Photo item);
-        void Remove(Photo item);
-        Task SaveChanges();
+        Task<IEnumerable<T>> GetAll();
+        Task<T> GetOne(System.Linq.Expressions.Expression<Func<T, bool>> predicate);
+        void Add(T entity);
+        void Remove(T entity);
     }
 
-    public class PhotoRepository : IRepository
+    public class PhotoRepository<T> : IRepository<T> where T : class
     {
-        private readonly PhotoContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public PhotoRepository(PhotoContext context)
+        public PhotoRepository(IUnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
-        public Task<List<Photo>> GetAll() =>
-            _context.Photos.Select(x => new Photo()
-            {
-                Guid = x.Guid,
-                PhotoName = x.PhotoName,
-                Id = x.Id
-            }).ToListAsync();
+        public Task<IEnumerable<T>> GetAll()
+        {
+            IEnumerable<T> photolist = _unitOfWork.Context.Set<T>().AsEnumerable();
+            return Task.FromResult(photolist);
+        }
 
-        public Task<Photo> GetOne(string guid) =>
-                _context.Photos.SingleOrDefaultAsync(m => m.Guid == guid);
 
-        public void Add(Photo item) =>
-            _context.Photos.Add(item);
+        public Task<T> GetOne(System.Linq.Expressions.Expression<Func<T, bool>> predicate)
+        {
+            T photolist = _unitOfWork.Context.Set<T>().Find(predicate);
+            return Task.FromResult(photolist);
+        }
 
-        public void Remove(Photo item) =>
-            _context.Photos.Remove(item);
 
-        public Task SaveChanges() =>
-            _context.SaveChangesAsync();
+        public void Add(T entity)
+        {
+            _unitOfWork.Context.Set<T>().Add(entity);
+        }
+
+        public void Remove(T entity)
+        {
+            T existing = _unitOfWork.Context.Set<T>().Find(entity);
+            if (existing != null) _unitOfWork.Context.Set<T>().Remove(existing);
+        }
     }
 }

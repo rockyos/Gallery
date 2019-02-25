@@ -10,12 +10,12 @@ namespace CoreTest.Services
 {
     public interface IPhotolistService
     {
-        List<Photo> GetPhotolistAsync(Photo model, IRepository _repository);
+        List<Photo> GetPhotolistAsync(Photo model, IRepository<Photo> _repository);
     }
 
     public class PhotolistService : IPhotolistService
     {
-        public List<Photo> GetPhotolistAsync(Photo model, IRepository _repository)
+        public List<Photo> GetPhotolistAsync(Photo model, IRepository<Photo> _repository)
         {
             List<Photo> photolist = new List<Photo>();
             foreach (var item in model.FormFile)

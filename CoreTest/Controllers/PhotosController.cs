@@ -15,20 +15,22 @@ namespace CoreTest.Controllers
     public class PhotosController : Controller
     {
         string sessionkey = "photos";
-        readonly IRepository _repository;
-        readonly IResizeService _resizer;
-        readonly IPhotolistService _photolistService;
-        readonly IGetPhotoService _getPhotoService;
-        readonly IIndexService _indexService;
-        readonly ISavePhotoService _savePhotoService;
-        readonly IDeleteService _deleteService;
+        private readonly IRepository<Photo> _repository;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IResizeService _resizer;
+        private readonly IPhotolistService _photolistService;
+        private readonly IGetPhotoService _getPhotoService;
+        private readonly IIndexService _indexService;
+        private readonly ISavePhotoService _savePhotoService;
+        private readonly IDeleteService _deleteService;
 
         protected ISession Session => HttpContext.Session;
 
-        public PhotosController(IRepository repository, IResizeService resizer, ISavePhotoService savePhotoService,
+        public PhotosController(IRepository<Photo> repository, IUnitOfWork unitOfWork, IResizeService resizer, ISavePhotoService savePhotoService,
             IPhotolistService photolistService, IGetPhotoService getPhotoService, IIndexService getindexService, IDeleteService deleteService) 
         {
             _repository = repository;
+            _unitOfWork = unitOfWork;
             _resizer = resizer;
             _photolistService = photolistService;
             _getPhotoService = getPhotoService;
@@ -40,7 +42,7 @@ namespace CoreTest.Controllers
        //[ResponseCache(Location = ResponseCacheLocation.Any, Duration = 300)]
         public async Task<IActionResult> ImageResize(string id, int width)
         {
-            Photo photo = await _repository.GetOne(id);
+            Photo photo = await _repository.GetOne(m => m.Guid == id);
             List<Photo> sessionPhotos = Session.Get<List<Photo>>(sessionkey);
             byte[] resizedImage = _resizer.GetImage(photo, sessionPhotos, id, width);
             return new FileContentResult(resizedImage, "binary/octet-stream");
@@ -55,7 +57,7 @@ namespace CoreTest.Controllers
 
         public async Task<IActionResult> GetListfromDB()
         {
-            List<Photo> photoFromDB = await _repository.GetAll();
+            List<Photo> photoFromDB = (List<Photo>) await _repository.GetAll();
             List<Photo> sessionPhotos = Session.Get<List<Photo>>(sessionkey);
             List<Photo> photos = _getPhotoService.GetPhotoDBandSession(photoFromDB, sessionPhotos);
             return Json(photos);
@@ -64,7 +66,7 @@ namespace CoreTest.Controllers
         public async Task<IActionResult> SavePhoto()
         {
             List<Photo> sessionPhotos = Session.Get<List<Photo>>(sessionkey);
-            await _savePhotoService.SavePhotoAsync(sessionPhotos, _repository);
+            await _savePhotoService.SavePhotoAsync(sessionPhotos, _repository, _unitOfWork);
             HttpContext.Session.Clear();
             return RedirectToAction(nameof(Index));
         }
