@@ -1,4 +1,5 @@
 ﻿using CoreTest.Models;
+using CoreTest.Repository;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -9,13 +10,21 @@ namespace CoreTest.Services
 {
     public interface IGetPhotoService
     {
-        List<Photo> GetPhotoDBandSession(List<Photo> photo, List<Photo> datasession);
+       Task<List<Photo>> GetPhotoDBandSessionAsync(List<Photo> datasession);
     }
 
     public class GetPhotoService : IGetPhotoService
     {
-        public List<Photo> GetPhotoDBandSession(List<Photo> photo, List<Photo> photosfromsession)
+        private readonly IRepository<Photo> _repository;
+        public GetPhotoService(IRepository<Photo> repository)
         {
+            _repository = repository;
+        }
+
+        public async Task<List<Photo>> GetPhotoDBandSessionAsync(List<Photo> photosfromsession)
+        {
+            List<Photo> photo = (List<Photo>) await _repository.GetAll();
+
             if (photosfromsession != null)
             {
                 foreach (var item in photosfromsession)
@@ -25,6 +34,6 @@ namespace CoreTest.Services
                 photo.AddRange(photosfromsession);
             }
             return photo;
-        }      
+        }
     }
 }

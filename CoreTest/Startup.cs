@@ -46,7 +46,7 @@ namespace CoreTest
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddScoped<IRepository<Photo>, PhotoRepository<Photo>>();
+            services.AddScoped(typeof(IRepository<>), typeof(PhotoRepository<>));
             services.AddScoped<IResizeService, ResizeService>();
             services.AddScoped<IPhotolistService, PhotolistService>();
             services.AddScoped<IGetPhotoService, GetPhotoService>();

@@ -1,4 +1,5 @@
 ﻿using CoreTest.Models;
+using CoreTest.Repository;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -13,13 +14,20 @@ namespace CoreTest.Services
 {
     public interface IResizeService
     {
-        byte[] GetImage(Photo photo, List<Photo> photosfromsession, string id, int width);
+        Task<byte[]> GetImageAsync(List<Photo> photosfromsession, string id, int width);
     }
 
     public class ResizeService : IResizeService
     {
-        public byte[] GetImage(Photo photo, List<Photo> photosfromsession, string id, int width)
+        private readonly IRepository<Photo> _repository;
+        public ResizeService(IRepository<Photo> repository)
         {
+            _repository = repository;
+        }
+
+        public async Task<byte[]> GetImageAsync(List<Photo> photosfromsession, string id, int width)
+        {
+            Photo photo = await _repository.GetOne(m => m.Guid == id);
             if (photo == null)
             {
                 foreach (var item in photosfromsession)

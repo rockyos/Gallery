@@ -10,12 +10,18 @@ namespace CoreTest.Services
 {
     public interface IDeleteService
     {
-        Task<List<Photo>> DeleteAsync(string guid, List<Photo> photos, IRepository<Photo> _repository);
+        Task<List<Photo>> DeleteAsync(string guid, List<Photo> photos);
     }
 
     public class DeleteService : IDeleteService
     {
-        public async Task<List<Photo>> DeleteAsync(string guid, List<Photo> photos, IRepository<Photo> _repository)
+        private readonly IRepository<Photo> _repository;
+        public DeleteService(IRepository<Photo> repository)
+        {
+            _repository = repository;
+        }
+
+        public async Task<List<Photo>> DeleteAsync(string guid, List<Photo> photos)
         {
             Photo photo = await _repository.GetOne(m => m.Guid == guid);
             if (photo != null)
