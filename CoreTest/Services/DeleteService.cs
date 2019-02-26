@@ -15,15 +15,15 @@ namespace CoreTest.Services
 
     public class DeleteService : IDeleteService
     {
-        private readonly IRepository<Photo> _repository;
-        public DeleteService(IRepository<Photo> repository)
+        UnitOFWork _uow { get; set; }
+        public DeleteService(UnitOFWork uow)
         {
-            _repository = repository;
+            _uow = uow;
         }
 
         public async Task<List<Photo>> DeleteAsync(string guid, List<Photo> photos)
         {
-            Photo photo = await _repository.GetOneAsync(m => m.Guid == guid);
+            Photo photo = await _uow.PhotoRepository.GetOneAsync(m => m.Guid == guid);
             if (photo != null)
             {
                 if(photos == null)

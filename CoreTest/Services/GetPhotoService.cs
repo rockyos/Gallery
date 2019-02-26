@@ -16,15 +16,15 @@ namespace CoreTest.Services
 
     public class GetPhotoService : IGetPhotoService
     {
-        private readonly IRepository<Photo> _repository;
-        public GetPhotoService(IRepository<Photo> repository)
+        UnitOFWork _uow { get; set; }
+        public GetPhotoService(UnitOFWork uow)
         {
-            _repository = repository;
+            _uow = uow;
         }
 
         public async Task<List<Photo>> GetPhotoDBandSessionAsync(List<Photo> photosfromsession)
         {
-            var photos = await _repository.GetList().Select(x => new Photo()
+            var photos = await _uow.PhotoRepository.GetList().Select(x => new Photo()
                 {
                     Id = x.Id,
                     Guid = x.Guid,

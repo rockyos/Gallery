@@ -15,7 +15,6 @@ namespace CoreTest.Repository
         Task AddAsync(T entity);
         Task AddRangeAsync(IEnumerable<T> entityList);
         void Remove(T entity);
-        Task SaveToDBAsync();
     }
 
     public class PhotoRepository<T> : IRepository<T> where T : class
@@ -51,11 +50,6 @@ namespace CoreTest.Repository
         public void Remove(T entity)
         {
             context.Set<T>().Remove(entity);
-        }
-
-        public async Task SaveToDBAsync()
-        {
-            await context.SaveChangesAsync();
         }
     }
 }

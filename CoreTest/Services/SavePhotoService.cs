@@ -15,10 +15,10 @@ namespace CoreTest.Services
 
     public class SavePhotoService : ISavePhotoService
     {
-        private readonly IRepository<Photo> _repository;
-        public SavePhotoService(IRepository<Photo> repository)
+        UnitOFWork _uow { get; set; }
+        public SavePhotoService(UnitOFWork uow)
         {
-            _repository = repository;
+            _uow = uow;
         }
         public async Task SavePhotoAsync(List<Photo> photosfromsession)
         {
@@ -27,18 +27,18 @@ namespace CoreTest.Services
             {
                 foreach (var item in photosfromsession)
                 {
-                    Photo photo = await _repository.GetOneAsync(m => m.Guid == item.Guid);
+                    Photo photo = await _uow.PhotoRepository.GetOneAsync(m => m.Guid == item.Guid);
                     if (photo != null)
                     {
-                        _repository.Remove(photo);
+                        _uow.PhotoRepository.Remove(photo);
                     }
                     else
                     {
                         item.Id = 0;
-                        await _repository.AddAsync(item);
+                        await _uow.PhotoRepository.AddAsync(item);
                     }
                 }
-                await _repository.SaveToDBAsync();
+                _uow.SaveAll();
             }
         }
     }

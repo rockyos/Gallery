@@ -19,15 +19,15 @@ namespace CoreTest.Services
 
     public class ResizeService : IResizeService
     {
-        private readonly IRepository<Photo> _repository;
-        public ResizeService(IRepository<Photo> repository)
+        UnitOFWork _uow { get; set; }
+        public ResizeService(UnitOFWork uow )
         {
-            _repository = repository;
+            _uow = uow;
         }
 
         public async Task<byte[]> GetImageAsync(List<Photo> photosfromsession, string id, int width)
         { 
-            Photo photo = await _repository.GetOneAsync(m => m.Guid == id);
+            Photo photo = await _uow.PhotoRepository.GetOneAsync(m => m.Guid == id);
             if (photo == null)
             {
                 foreach (var item in photosfromsession)
