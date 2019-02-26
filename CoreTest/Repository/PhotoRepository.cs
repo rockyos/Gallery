@@ -13,40 +13,45 @@ namespace CoreTest.Repository
         Task<T> GetOne(System.Linq.Expressions.Expression<Func<T, bool>> predicate);
         void Add(T entity);
         void Remove(T entity);
+        void SaveToDB();
     }
 
     public class PhotoRepository<T> : IRepository<T> where T : class
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly PhotoContext context;
 
-        public PhotoRepository(IUnitOfWork unitOfWork)
+        public PhotoRepository(PhotoContext photoContext)
         {
-            _unitOfWork = unitOfWork;
+            context = photoContext;
         }
 
         public Task<IEnumerable<T>> GetAll()
         {
-            IEnumerable<T> photolist = _unitOfWork.Context.Set<T>().AsEnumerable();
+            IEnumerable<T> photolist = context.Set<T>().AsEnumerable();
             return Task.FromResult(photolist);
         }
 
 
         public Task<T> GetOne(System.Linq.Expressions.Expression<Func<T, bool>> predicate)
         {
-            T photolist = _unitOfWork.Context.Set<T>().Find(predicate);
+            T photolist = context.Set<T>().Find(predicate);
             return Task.FromResult(photolist);
         }
 
 
         public void Add(T entity)
         {
-            _unitOfWork.Context.Set<T>().Add(entity);
+            context.Set<T>().Add(entity);
         }
 
         public void Remove(T entity)
         {
-            T existing = _unitOfWork.Context.Set<T>().Find(entity);
-            if (existing != null) _unitOfWork.Context.Set<T>().Remove(existing);
+            T existing = context.Set<T>().Find(entity);
+            if (existing != null) context.Set<T>().Remove(existing);
+        }
+        public void SaveToDB()
+        {
+            context.SaveChangesAsync();
         }
     }
 }

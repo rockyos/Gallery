@@ -16,7 +16,6 @@ namespace CoreTest.Controllers
     {
         string sessionkey = "photos";
         private readonly IRepository<Photo> _repository;
-        private readonly IUnitOfWork _unitOfWork;
         private readonly IResizeService _resizer;
         private readonly IPhotolistService _photolistService;
         private readonly IGetPhotoService _getPhotoService;
@@ -26,11 +25,10 @@ namespace CoreTest.Controllers
 
         protected ISession Session => HttpContext.Session;
 
-        public PhotosController(IRepository<Photo> repository, IUnitOfWork unitOfWork, IResizeService resizer, ISavePhotoService savePhotoService,
+        public PhotosController(IRepository<Photo> repository, IResizeService resizer, ISavePhotoService savePhotoService,
             IPhotolistService photolistService, IGetPhotoService getPhotoService, IIndexService getindexService, IDeleteService deleteService) 
         {
             _repository = repository;
-            _unitOfWork = unitOfWork;
             _resizer = resizer;
             _photolistService = photolistService;
             _getPhotoService = getPhotoService;
@@ -66,7 +64,7 @@ namespace CoreTest.Controllers
         public async Task<IActionResult> SavePhoto()
         {
             List<Photo> sessionPhotos = Session.Get<List<Photo>>(sessionkey);
-            await _savePhotoService.SavePhotoAsync(sessionPhotos, _repository, _unitOfWork);
+            await _savePhotoService.SavePhotoAsync(sessionPhotos, _repository);
             HttpContext.Session.Clear();
             return RedirectToAction(nameof(Index));
         }
