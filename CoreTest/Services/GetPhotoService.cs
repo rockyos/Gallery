@@ -1,5 +1,6 @@
 ﻿using CoreTest.Models;
 using CoreTest.Repository;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -23,17 +24,20 @@ namespace CoreTest.Services
 
         public async Task<List<Photo>> GetPhotoDBandSessionAsync(List<Photo> photosfromsession)
         {
-            List<Photo> photo = (List<Photo>) await _repository.GetAll();
-
+            var photos = await _repository.GetList().Select(x => new Photo()
+                {
+                    Id = x.Id,
+                    Guid = x.Guid,
+                    PhotoName = x.PhotoName
+                })
+                .ToListAsync();
+            
             if (photosfromsession != null)
             {
-                foreach (var item in photosfromsession)
-                {
-                    item.ImageContent = null;
-                }
-                photo.AddRange(photosfromsession);
+                photosfromsession.ForEach(x => x.ImageContent = null);
+                photos.AddRange(photosfromsession);
             }
-            return photo;
+            return photos;
         }
     }
 }

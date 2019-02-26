@@ -1,19 +1,21 @@
-﻿ using CoreTest.Models;
+﻿using CoreTest.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace CoreTest.Repository
 {
     public interface IRepository<T> where T : class
     {
-        Task<IEnumerable<T>> GetAll();
-        Task<T> GetOne(System.Linq.Expressions.Expression<Func<T, bool>> predicate);
-        void Add(T entity);
+        IQueryable<T> GetList();
+        Task<T> GetOneAsync(Expression<Func<T, bool>> predicate);
+        Task AddAsync(T entity);
+        Task AddRangeAsync(IEnumerable<T> entityList);
         void Remove(T entity);
-        void SaveToDB();
+        Task SaveToDBAsync();
     }
 
     public class PhotoRepository<T> : IRepository<T> where T : class
@@ -25,33 +27,35 @@ namespace CoreTest.Repository
             context = photoContext;
         }
 
-        public Task<IEnumerable<T>> GetAll()
+        public IQueryable<T> GetList()
         {
-            IEnumerable<T> photolist = context.Set<T>().AsEnumerable();
-            return Task.FromResult(photolist);
+            return context.Set<T>();
+        }
+
+        public async Task<T> GetOneAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await context.Set<T>().FirstOrDefaultAsync(predicate);
         }
 
 
-        public Task<T> GetOne(System.Linq.Expressions.Expression<Func<T, bool>> predicate)
+        public async Task AddAsync(T entity)
         {
-            T photolist = context.Set<T>().Find(predicate);
-            return Task.FromResult(photolist);
+            await context.Set<T>().AddAsync(entity);
         }
 
-
-        public void Add(T entity)
+        public async Task AddRangeAsync(IEnumerable<T> entityList)
         {
-            context.Set<T>().Add(entity);
+            await context.Set<T>().AddRangeAsync(entityList);
         }
 
         public void Remove(T entity)
         {
-            T existing = context.Set<T>().Find(entity);
-            if (existing != null) context.Set<T>().Remove(existing);
+            context.Set<T>().Remove(entity);
         }
-        public void SaveToDB()
+
+        public async Task SaveToDBAsync()
         {
-            context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
     }
 }

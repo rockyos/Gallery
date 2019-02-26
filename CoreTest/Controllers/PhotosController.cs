@@ -16,7 +16,6 @@ namespace CoreTest.Controllers
     {
         string sessionkey = "photos";
         private readonly IResizeService _resizer;
-        private readonly IPhotolistService _photolistService;
         private readonly IGetPhotoService _getPhotoService;
         private readonly IIndexService _indexService;
         private readonly ISavePhotoService _savePhotoService;
@@ -25,10 +24,9 @@ namespace CoreTest.Controllers
         protected ISession Session => HttpContext.Session;
 
         public PhotosController(IResizeService resizer, ISavePhotoService savePhotoService,
-            IPhotolistService photolistService, IGetPhotoService getPhotoService, IIndexService getindexService, IDeleteService deleteService) 
+            IGetPhotoService getPhotoService, IIndexService getindexService, IDeleteService deleteService) 
         {
             _resizer = resizer;
-            _photolistService = photolistService;
             _getPhotoService = getPhotoService;
             _indexService = getindexService;
             _savePhotoService = savePhotoService;

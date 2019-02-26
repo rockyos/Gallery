@@ -26,8 +26,8 @@ namespace CoreTest.Services
         }
 
         public async Task<byte[]> GetImageAsync(List<Photo> photosfromsession, string id, int width)
-        {
-            Photo photo = await _repository.GetOne(m => m.Guid == id);
+        { 
+            Photo photo = await _repository.GetOneAsync(m => m.Guid == id);
             if (photo == null)
             {
                 foreach (var item in photosfromsession)

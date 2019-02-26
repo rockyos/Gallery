@@ -23,7 +23,7 @@ namespace CoreTest.Services
 
         public async Task<List<Photo>> DeleteAsync(string guid, List<Photo> photos)
         {
-            Photo photo = await _repository.GetOne(m => m.Guid == guid);
+            Photo photo = await _repository.GetOneAsync(m => m.Guid == guid);
             if (photo != null)
             {
                 if(photos == null)

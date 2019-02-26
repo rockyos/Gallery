@@ -48,7 +48,6 @@ namespace CoreTest
 
             services.AddScoped(typeof(IRepository<>), typeof(PhotoRepository<>));
             services.AddScoped<IResizeService, ResizeService>();
-            services.AddScoped<IPhotolistService, PhotolistService>();
             services.AddScoped<IGetPhotoService, GetPhotoService>();
             services.AddScoped<IIndexService, IndexService>();
             services.AddScoped<ISavePhotoService, SavePhotoService>();

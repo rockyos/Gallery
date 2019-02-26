@@ -27,7 +27,7 @@ namespace CoreTest.Services
             {
                 foreach (var item in photosfromsession)
                 {
-                    Photo photo = await _repository.GetOne(m => m.Guid == item.Guid);
+                    Photo photo = await _repository.GetOneAsync(m => m.Guid == item.Guid);
                     if (photo != null)
                     {
                         _repository.Remove(photo);
@@ -35,10 +35,10 @@ namespace CoreTest.Services
                     else
                     {
                         item.Id = 0;
-                        _repository.Add(item);
+                        await _repository.AddAsync(item);
                     }
                 }
-                _repository.SaveToDB();
+                await _repository.SaveToDBAsync();
             }
         }
     }
