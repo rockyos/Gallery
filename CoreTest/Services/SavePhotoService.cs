@@ -34,7 +34,6 @@ namespace CoreTest.Services
                     }
                     else
                     {
-                        item.Id = 0;
                         await _uow.PhotoRepository.AddAsync(item);
                     }
                 }

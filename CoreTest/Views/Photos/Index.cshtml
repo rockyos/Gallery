@@ -37,7 +37,7 @@
             sortable: false,
             undefinedText: '',
             formatNoMatches: function() {
-                return 'No Items';
+                return 'No Photos';
             },
             columns: [
                 {
@@ -58,7 +58,7 @@
                                 type: 'POST',
                                 data: { guid: row.guid },
                                 success: function () {
-                                   $("#imagesTable").bootstrapTable('hideRow', { index: index });
+                                   $table.bootstrapTable('hideRow', { index: index });
                                 },
                             });;
 
@@ -69,7 +69,7 @@
         });
 
 
-        $('#imagesTable').on('load-success.bs.table', function() {
+        $table.on('load-success.bs.table', function() {
             $("a#single_image").fancybox();
         });
 
@@ -97,13 +97,14 @@
             addNewImage();
         });
 
+
         function saveAndResetBtn(path) {
             $.ajax({
                 type: 'POST',
                 url: path,
                 success: function () {
-                    $('#imagesTable').bootstrapTable('getHiddenRows', true);
-                    $('#imagesTable').bootstrapTable('refresh');
+                    $table.bootstrapTable('getHiddenRows', true);
+                    $table.bootstrapTable('refresh');
                 },
             });
         }
@@ -124,7 +125,7 @@
                         contentType: false,
                         success: function (result) {
                             $('#loaderimg').hide();
-                            $('#imagesTable').bootstrapTable('refresh');
+                            $table.bootstrapTable('refresh');
                         },
                         error: function (error) {
                             $('#loaderimg').hide();

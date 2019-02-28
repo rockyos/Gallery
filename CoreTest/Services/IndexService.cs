@@ -19,10 +19,10 @@ namespace CoreTest.Services
         public List<Photo> GetIndexService(Photo photo, List<Photo> photosfromsession)
         {
             Photo photolist = new Photo();
-            using (var reader = new BinaryReader(photo.FormFile[0].OpenReadStream()))
+            using (var reader = new BinaryReader(photo.FormFile.OpenReadStream()))
             {
-                byte[] img = reader.ReadBytes((int)photo.FormFile[0].Length);
-                photolist.PhotoName = photo.FormFile[0].FileName;
+                byte[] img = reader.ReadBytes((int)photo.FormFile.Length);
+                photolist.PhotoName = photo.FormFile.FileName;
                 photolist.ImageContent = img;
                 photolist.Guid = Guid.NewGuid().ToString();
             }
