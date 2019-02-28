@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace CoreTest.Services
 {
@@ -15,15 +16,15 @@ namespace CoreTest.Services
 
     public class DeleteService : IDeleteService
     {
-        UnitOFWork _uow { get; set; }
-        public DeleteService(UnitOFWork uow)
+        UnitOfWork _uow { get; set; }
+        public DeleteService(UnitOfWork uow)
         {
             _uow = uow;
         }
 
         public async Task<List<Photo>> DeleteAsync(string guid, List<Photo> photos)
         {
-            Photo photo = await _uow.PhotoRepository.GetOneAsync(m => m.Guid == guid);
+            Photo photo = await (await _uow.PhotoRepository.GetAllAsync()).FirstOrDefaultAsync(m => m.Guid == guid);
             if (photo != null)
             {
                 if(photos == null)

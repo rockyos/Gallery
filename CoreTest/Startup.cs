@@ -47,8 +47,7 @@ namespace CoreTest
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddScoped<UnitOFWork>();
-            services.AddScoped(typeof(IRepository<>), typeof(PhotoRepository<>));
+            services.AddScoped<UnitOfWork>();
             services.AddScoped<IResizeService, ResizeService>();
             services.AddScoped<IGetPhotoService, GetPhotoService>();
             services.AddScoped<IIndexService, IndexService>();
@@ -61,7 +60,11 @@ namespace CoreTest
                 .AddViewOptions(options =>
                 {
                     options.HtmlHelperOptions.ClientValidationEnabled = true;
-                }); 
+                });
+
+            Mapper.Initialize(
+                cfg => cfg.CreateMap<Photo, PhotoDTO>()
+            );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -76,10 +79,6 @@ namespace CoreTest
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
-
-            Mapper.Initialize(
-                cfg => cfg.CreateMap<Photo, PhotoDTO>()
-            );
 
             app.UseSession();
             app.UseHttpsRedirection();

@@ -17,15 +17,16 @@ namespace CoreTest.Services
 
     public class GetPhotoService : IGetPhotoService
     {
-        UnitOFWork _uow { get; set; }
-        public GetPhotoService(UnitOFWork uow)
+        UnitOfWork _uow { get; set; }
+
+        public GetPhotoService(UnitOfWork uow)
         {
             _uow = uow;
         }
 
         public async Task<List<PhotoDTO>> GetPhotoDBandSessionAsync(List<Photo> photosfromsession)
         {
-            List<Photo> photoFromDB = await _uow.PhotoRepository.GetList().ToListAsync();
+            List<Photo> photoFromDB = await (await _uow.PhotoRepository.GetAllAsync()).ToListAsync();
             if (photosfromsession != null)
             {
                 photoFromDB.AddRange(photosfromsession);

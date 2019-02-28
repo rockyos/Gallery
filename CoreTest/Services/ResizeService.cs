@@ -1,7 +1,6 @@
 ﻿using CoreTest.Models;
 using CoreTest.Repository;
-using Newtonsoft.Json;
-using System;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -17,17 +16,16 @@ namespace CoreTest.Services
         Task<byte[]> GetImageAsync(List<Photo> photosfromsession, string id, int width);
     }
 
-    public class ResizeService : IResizeService
+    public class ResizeService : BaseService, IResizeService
     {
-        UnitOFWork _uow { get; set; }
-        public ResizeService(UnitOFWork uow )
+        public ResizeService(UnitOfWork unitOfWork) : base(unitOfWork)
         {
-            _uow = uow;
         }
 
         public async Task<byte[]> GetImageAsync(List<Photo> photosfromsession, string id, int width)
-        { 
-            Photo photo = await _uow.PhotoRepository.GetOneAsync(m => m.Guid == id);
+        {
+            var photo = await (await UnitOfWork.PhotoRepository.GetAllAsync()).FirstOrDefaultAsync(m => m.Guid == id);
+
             if (photo == null)
             {
                 foreach (var item in photosfromsession)
@@ -52,8 +50,8 @@ namespace CoreTest.Services
                     int imageWidth = bmp.Width;
                     if (imageWidth > width)
                     {
-                        float ratio = (float)imageWidth / (float)imageHeight;
-                        var resized_Bitmap = new Bitmap((int)width, (int)(width / ratio));
+                        float ratio = imageWidth / (float)imageHeight;
+                        var resized_Bitmap = new Bitmap(width, (int)(width / ratio));
                         using (var graphics = Graphics.FromImage(resized_Bitmap))
                         {
                             graphics.CompositingQuality = CompositingQuality.HighSpeed;
@@ -75,7 +73,8 @@ namespace CoreTest.Services
                 }
                 return memoryStream.ToArray();
             }
-            else {
+            else
+            {
                 return photo.ImageContent;
             }
         }

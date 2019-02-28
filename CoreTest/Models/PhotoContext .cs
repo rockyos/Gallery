@@ -11,6 +11,7 @@ namespace CoreTest.Models
         {
             Database.EnsureCreated();
         }
+
         public DbSet<Photo> Photos { get; set; }
     }
 
