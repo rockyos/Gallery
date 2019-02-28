@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using CoreTest.Models;
 using CoreTest.Repository;
 using CoreTest.Services;
@@ -75,6 +76,10 @@ namespace CoreTest
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+
+            Mapper.Initialize(
+                cfg => cfg.CreateMap<Photo, PhotoDTO>()
+            );
 
             app.UseSession();
             app.UseHttpsRedirection();

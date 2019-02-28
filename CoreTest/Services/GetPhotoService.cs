@@ -25,16 +25,13 @@ namespace CoreTest.Services
 
         public async Task<List<PhotoDTO>> GetPhotoDBandSessionAsync(List<Photo> photosfromsession)
         {
-
-            Mapper.Initialize(cfg => cfg.CreateMap<Photo, PhotoDTO>());
-            var photos = Mapper.Map<List<Photo>, List<PhotoDTO>>(await _uow.PhotoRepository.GetList().ToListAsync());
-            
+            List<Photo> photoFromDB = await _uow.PhotoRepository.GetList().ToListAsync();
             if (photosfromsession != null)
             {
-                var photoDTOfromsession = Mapper.Map<List<Photo>, List<PhotoDTO>>(photosfromsession);
-                photos.AddRange(photoDTOfromsession);
+                photoFromDB.AddRange(photosfromsession);
             }
-            return photos;
+            List<PhotoDTO> photosDTO = Mapper.Map<List<Photo>, List<PhotoDTO>>(photoFromDB);
+            return photosDTO;
         }
     }
 }
