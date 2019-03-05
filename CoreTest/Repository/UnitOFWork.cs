@@ -9,16 +9,14 @@ namespace CoreTest.Repository
     public class UnitOfWork : IUnitOfWork
     {
         private IPhotoRepository _photoRepository;
+        public PhotoContext ApplicationContext { get; }
 
         public UnitOfWork(PhotoContext сontext)
         {
             ApplicationContext = сontext;
         }
 
-        public PhotoContext ApplicationContext { get; }
-
         public IPhotoRepository PhotoRepository => _photoRepository ?? (_photoRepository = new PhotoRepository(ApplicationContext));
-
 
         public async Task SubmitChangesAsync()
         {

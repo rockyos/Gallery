@@ -33,7 +33,6 @@ namespace CoreTest
             services.AddDbContext<PhotoContext>(options =>
                 options.UseSqlServer(conn));
 
-
             services.AddDistributedMemoryCache(); // IDistributedCache
             services.AddSession(options =>
             {
@@ -54,13 +53,12 @@ namespace CoreTest
             services.AddScoped<ISavePhotoService, SavePhotoService>();
             services.AddScoped<IDeleteService, DeleteService>();
 
-
-
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddViewOptions(options =>
                 {
                     options.HtmlHelperOptions.ClientValidationEnabled = true;
                 });
+
 
             Mapper.Initialize(
                 cfg => cfg.CreateMap<Photo, PhotoDTO>()

@@ -11,13 +11,12 @@ namespace CoreTest.Services
         Task SavePhotoAsync(List<Photo> photosfromsession);
     }
 
-    public class SavePhotoService : ISavePhotoService
+    public class SavePhotoService : BaseService, ISavePhotoService
     {
-        private UnitOfWork _uow { get; set; }
-        public SavePhotoService(UnitOfWork uow)
+        public SavePhotoService(UnitOfWork unitOfWork) : base(unitOfWork)
         {
-            _uow = uow;
         }
+
         public async Task SavePhotoAsync(List<Photo> photosfromsession)
         {
 
@@ -25,17 +24,17 @@ namespace CoreTest.Services
             {
                 foreach (var item in photosfromsession)
                 {
-                    Photo photo = await (await _uow.PhotoRepository.GetAllAsync()).FirstOrDefaultAsync(m => m.Guid == item.Guid);
+                    Photo photo = await (await UnitOfWork.PhotoRepository.GetAllAsync()).FirstOrDefaultAsync(m => m.Guid == item.Guid);
                     if (photo != null)
                     {
-                        await _uow.PhotoRepository.RemoveAsync(photo);
+                        await UnitOfWork.PhotoRepository.RemoveAsync(photo);
                     }
                     else
                     {
-                        await _uow.PhotoRepository.InsertAsync(item);
+                        await UnitOfWork.PhotoRepository.InsertAsync(item);
                     }
                 }
-                await _uow.SubmitChangesAsync();
+                await UnitOfWork.SubmitChangesAsync();
             }
         }
     }

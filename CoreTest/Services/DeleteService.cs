@@ -14,17 +14,15 @@ namespace CoreTest.Services
         Task<List<Photo>> DeleteAsync(string guid, List<Photo> photos);
     }
 
-    public class DeleteService : IDeleteService
+    public class DeleteService : BaseService, IDeleteService
     {
-        UnitOfWork _uow { get; set; }
-        public DeleteService(UnitOfWork uow)
-        {
-            _uow = uow;
+        public DeleteService(UnitOfWork unitOfWork) : base(unitOfWork)
+        {   
         }
 
         public async Task<List<Photo>> DeleteAsync(string guid, List<Photo> photos)
         {
-            Photo photo = await (await _uow.PhotoRepository.GetAllAsync()).FirstOrDefaultAsync(m => m.Guid == guid);
+            Photo photo = await (await UnitOfWork.PhotoRepository.GetAllAsync()).FirstOrDefaultAsync(m => m.Guid == guid);
             if (photo != null)
             {
                 if(photos == null)
