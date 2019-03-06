@@ -2,6 +2,7 @@
 using CoreTest.Models;
 using CoreTest.Repository;
 using CoreTest.Services;
+using CoreTest.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;

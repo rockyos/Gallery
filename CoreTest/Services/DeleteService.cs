@@ -6,42 +6,38 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using CoreTest.Services.Interfaces;
 
 namespace CoreTest.Services
 {
-    public interface IDeleteService
-    {
-        Task<List<Photo>> DeleteAsync(string guid, List<Photo> photos);
-    }
-
     public class DeleteService : BaseService, IDeleteService
     {
         public DeleteService(UnitOfWork unitOfWork) : base(unitOfWork)
         {   
         }
 
-        public async Task<List<Photo>> DeleteAsync(string guid, List<Photo> photos)
+        public async Task<List<Photo>> DeleteAsync(string guid, List<Photo> photosInSession)
         {
-            Photo photo = await (await UnitOfWork.PhotoRepository.GetAllAsync()).FirstOrDefaultAsync(m => m.Guid == guid);
-            if (photo != null)
+            Photo photoDB = await (await UnitOfWork.PhotoRepository.GetAllAsync()).FirstOrDefaultAsync(m => m.Guid == guid);
+            if (photoDB != null)
             {
-                if(photos == null)
+                if(photosInSession == null)
                 {
-                    photos = new List<Photo>();
+                    photosInSession = new List<Photo>();
                 }
-                photos.Add(photo);
+                photosInSession.Add(photoDB);
             } else
             {
-                foreach (var item in photos)
+                foreach (var item in photosInSession)
                 {
                     if (item.Guid == guid)
                     {
-                        photos.Remove(item);
+                        photosInSession.Remove(item);
                         break;
                     }
                 }
             }
-            return photos;
+            return photosInSession;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CoreTest.Models;
 using CoreTest.Repository;
+using CoreTest.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
@@ -10,25 +11,22 @@ using System.Threading.Tasks;
 
 namespace CoreTest.Services
 {
-    public interface IGetPhotoService
-    {
-       Task<List<PhotoDTO>> GetPhotoDBandSessionAsync(List<Photo> datasession);
-    }
-
     public class GetPhotoService : BaseService, IGetPhotoService
     {
-        public GetPhotoService(UnitOfWork unitOfWork) : base(unitOfWork)
+        private IMapper _mapper;
+        public GetPhotoService(UnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork)
         {
+            _mapper = mapper;
         }
 
-        public async Task<List<PhotoDTO>> GetPhotoDBandSessionAsync(List<Photo> photosfromsession)
+        public async Task<List<PhotoDTO>> GetPhotoDBandSessionAsync(List<Photo> photosFromSession)
         {
             List<Photo> photoFromDB = await (await UnitOfWork.PhotoRepository.GetAllAsync()).ToListAsync();
-            if (photosfromsession != null)
+            if (photosFromSession != null)
             {
-                photoFromDB.AddRange(photosfromsession);
+                photoFromDB.AddRange(photosFromSession);
             }
-            List<PhotoDTO> photosDTO = Mapper.Map<List<Photo>, List<PhotoDTO>>(photoFromDB);
+            List<PhotoDTO> photosDTO = _mapper.Map<List<Photo>, List<PhotoDTO>>(photoFromDB);
             return photosDTO;
         }
     }

@@ -1,5 +1,6 @@
 ﻿using CoreTest.Models;
 using CoreTest.Repository;
+using CoreTest.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Drawing;
@@ -11,53 +12,47 @@ using System.Threading.Tasks;
 
 namespace CoreTest.Services
 {
-    public interface IResizeService
-    {
-        Task<byte[]> GetImageAsync(List<Photo> photosfromsession, string id, int width);
-    }
-
     public class ResizeService : BaseService, IResizeService
     {
         public ResizeService(UnitOfWork unitOfWork) : base(unitOfWork)
         {
         }
 
-        public async Task<byte[]> GetImageAsync(List<Photo> photosfromsession, string id, int width)
+        public async Task<byte[]> GetImageAsync(List<Photo> photosInSession, string id, int photoWidthInPixel)
         {
-            var photo = await (await UnitOfWork.PhotoRepository.GetAllAsync()).FirstOrDefaultAsync(m => m.Guid == id);
-
-            if (photo == null)
+            Photo photoDB = await (await UnitOfWork.PhotoRepository.GetAllAsync()).FirstOrDefaultAsync(m => m.Guid == id);
+            if (photoDB == null)
             {
-                foreach (var item in photosfromsession)
+                foreach (var item in photosInSession)
                 {
                     if (item.Guid == id)
                     {
-                        photo = item;
+                        photoDB = item;
                         break;
                     }
                 }
             }
 
-            if (width != 0)
+            if (photoWidthInPixel != 0)
             {
                 Bitmap bmp;
                 MemoryStream memoryStream = new MemoryStream();
-                const long quality = 50;
-                using (var ms = new MemoryStream(photo.ImageContent))
+                const long quality = 50; // picture quality max 100
+                using (var ms = new MemoryStream(photoDB.ImageContent))
                 {
                     bmp = new Bitmap(ms);
                     int imageHeight = bmp.Height;
                     int imageWidth = bmp.Width;
-                    if (imageWidth > width)
+                    if (imageWidth > photoWidthInPixel)
                     {
                         float ratio = imageWidth / (float)imageHeight;
-                        var resized_Bitmap = new Bitmap(width, (int)(width / ratio));
+                        var resized_Bitmap = new Bitmap(photoWidthInPixel, (int)(photoWidthInPixel / ratio));
                         using (var graphics = Graphics.FromImage(resized_Bitmap))
                         {
                             graphics.CompositingQuality = CompositingQuality.HighSpeed;
                             graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
                             graphics.CompositingMode = CompositingMode.SourceCopy;
-                            graphics.DrawImage(bmp, 0, 0, width, width / ratio);
+                            graphics.DrawImage(bmp, 0, 0, photoWidthInPixel, photoWidthInPixel / ratio);
 
                             var qualityParamId = Encoder.Quality;
                             var encoderParameters = new EncoderParameters(1);
@@ -75,7 +70,7 @@ namespace CoreTest.Services
             }
             else
             {
-                return photo.ImageContent;
+                return photoDB.ImageContent;
             }
         }
     }

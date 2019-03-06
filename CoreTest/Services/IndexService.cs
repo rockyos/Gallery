@@ -1,4 +1,5 @@
 ﻿using CoreTest.Models;
+using CoreTest.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
@@ -9,32 +10,26 @@ using System.Threading.Tasks;
 
 namespace CoreTest.Services
 {
-    public interface IIndexService
-    {
-        List<Photo> GetIndexService(Photo photo, List<Photo> datasession);
-    }
-
     public class IndexService : IIndexService
     {
-        public List<Photo> GetIndexService(Photo photo, List<Photo> photosfromsession)
+        public List<Photo> GetIndexService(Photo photoFromClient, List<Photo> photosInSession)
         {
-            Photo photolist = new Photo();
-            using (var reader = new BinaryReader(photo.FormFile.OpenReadStream()))
+            Photo photo = new Photo();
+            using (var reader = new BinaryReader(photoFromClient.FormFile.OpenReadStream()))
             {
-                byte[] img = reader.ReadBytes((int)photo.FormFile.Length);
-                photolist.PhotoName = photo.FormFile.FileName;
-                photolist.ImageContent = img;
-                photolist.Guid = Guid.NewGuid().ToString();
+                byte[] img = reader.ReadBytes((int)photoFromClient.FormFile.Length);
+                photo.PhotoName = photoFromClient.FormFile.FileName;
+                photo.ImageContent = img;
+                photo.Guid = Guid.NewGuid().ToString();
             }
 
-            if (photosfromsession != null)
+            if (photosInSession != null)
             {
-                photosfromsession.Add(photolist);
-                return photosfromsession;
-            }
-            else
+                photosInSession.Add(photo);
+                return photosInSession;
+            } else
             {
-                return new List<Photo>() { photolist };
+                return new List<Photo>() { photo };
             }
         }
     }

@@ -6,6 +6,7 @@ using AutoMapper;
 using CoreTest.Models;
 using CoreTest.Repository;
 using CoreTest.Services;
+using CoreTest.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -59,10 +60,12 @@ namespace CoreTest
                     options.HtmlHelperOptions.ClientValidationEnabled = true;
                 });
 
+            var mapconfig = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile(new AutoMapperProfile());
+            });
 
-            Mapper.Initialize(
-                cfg => cfg.CreateMap<Photo, PhotoDTO>()
-            );
+            services.AddSingleton(mapconfig.CreateMapper());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

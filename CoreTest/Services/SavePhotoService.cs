@@ -1,33 +1,28 @@
 ﻿using CoreTest.Models;
 using CoreTest.Repository;
+using CoreTest.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace CoreTest.Services
 {
-    public interface ISavePhotoService
-    {
-        Task SavePhotoAsync(List<Photo> photosfromsession);
-    }
-
     public class SavePhotoService : BaseService, ISavePhotoService
     {
         public SavePhotoService(UnitOfWork unitOfWork) : base(unitOfWork)
         {
         }
 
-        public async Task SavePhotoAsync(List<Photo> photosfromsession)
+        public async Task SavePhotoAsync(List<Photo> photosInSession)
         {
-
-            if (photosfromsession != null)
+            if (photosInSession != null)
             {
-                foreach (var item in photosfromsession)
+                foreach (var item in photosInSession)
                 {
-                    Photo photo = await (await UnitOfWork.PhotoRepository.GetAllAsync()).FirstOrDefaultAsync(m => m.Guid == item.Guid);
-                    if (photo != null)
+                    Photo photoDB = await (await UnitOfWork.PhotoRepository.GetAllAsync()).FirstOrDefaultAsync(m => m.Guid == item.Guid);
+                    if (photoDB != null)
                     {
-                        await UnitOfWork.PhotoRepository.RemoveAsync(photo);
+                        await UnitOfWork.PhotoRepository.RemoveAsync(photoDB);
                     }
                     else
                     {
