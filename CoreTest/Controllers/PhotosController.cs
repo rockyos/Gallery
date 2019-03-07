@@ -52,7 +52,7 @@ namespace CoreTest.Controllers
         public async Task<IActionResult> GetListfromDB()
         {
             List<Photo> sessionPhotos = Session.Get<List<Photo>>(sessionkey);
-            List<PhotoDTO> photos = await _getPhotoService.GetPhotoDBandSessionAsync(sessionPhotos);
+            List<PhotoDTO> photos = await _getPhotoService.GetPhotoDBandSessionAsync(sessionPhotos, Session, sessionkey);
             return Json(photos);
         }
 
