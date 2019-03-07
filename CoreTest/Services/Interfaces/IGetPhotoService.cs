@@ -9,6 +9,6 @@ namespace CoreTest.Services.Interfaces
 {
     public interface IGetPhotoService
     {
-        Task<List<PhotoDTO>> GetPhotoDBandSessionAsync(List<Photo> photosFromSession, ISession session, string sessionkey);
+        Task<List<PhotoDTO>> GetPhotoDBandSessionAsync(ISession session, string sessionkey);
     }
 }

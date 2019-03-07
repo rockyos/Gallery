@@ -7,6 +7,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using CoreTest.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
+using CoreTest.Extensions;
 
 namespace CoreTest.Services
 {
@@ -16,8 +18,9 @@ namespace CoreTest.Services
         {   
         }
 
-        public async Task<List<Photo>> DeleteAsync(string guid, List<Photo> photosInSession)
+        public async Task DeleteAsync(string guid, ISession Session, string sessionkey)
         {
+            List<Photo> photosInSession = Session.Get<List<Photo>>(sessionkey);
             Photo photoDB = await (await UnitOfWork.PhotoRepository.GetAllAsync()).FirstOrDefaultAsync(m => m.Guid == guid);
             if (photoDB != null)
             {
@@ -37,7 +40,7 @@ namespace CoreTest.Services
                     }
                 }
             }
-            return photosInSession;
+           Session.Set(sessionkey, photosInSession);
         }
     }
 }

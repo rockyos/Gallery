@@ -21,29 +21,29 @@ namespace CoreTest.Services
             _mapper = mapper;
         }
 
-        public async Task<List<PhotoDTO>> GetPhotoDBandSessionAsync(List<Photo> photosFromSession, ISession Session, string sessionkey)
+        public async Task<List<PhotoDTO>> GetPhotoDBandSessionAsync( ISession Session, string sessionkey)
         {
+            List<Photo> photosFromSession = Session.Get<List<Photo>>(sessionkey);
+            if (photosFromSession != null)
+            {
+                photosFromSession = photosFromSession.GroupBy(x => x.Guid).Select(y => y.First()).ToList();
+            }
+
             List<Photo> photoFromDB = await (await UnitOfWork.PhotoRepository.GetAllAsync()).ToListAsync();
             if (photosFromSession != null)
             {
-                List<Photo> equalPhoto = new List<Photo>(); // find dublicate Photo in session and DB and delete their from session
+                List<Photo> equalPhoto = new List<Photo>(); // find dublicate Photo in session and DB 
                 foreach (var item in photosFromSession)
                 {
-                    if (photoFromDB.Find(c => c.Guid == item.Guid) != null)
+                    Photo photo = photoFromDB.Find(c => c.Guid == item.Guid);
+                    if (photo != null)
                     {
-                        equalPhoto.Add(item);
+                        equalPhoto.Add(photo);
                     }
                 }
-                photosFromSession.RemoveAll(i => equalPhoto.Contains(i));
-                if (equalPhoto.Capacity != 0) // if find dublicate Photo save to session
-                {
-                    Session.Set(sessionkey, photosFromSession);
-                }
-
-                if (photosFromSession != null)
-                {
-                    photoFromDB.AddRange(photosFromSession);
-                }                  
+                photoFromDB.RemoveAll(i => equalPhoto.Contains(i));
+                photoFromDB.AddRange(photosFromSession);
+               
             }
             List<PhotoDTO> photosDTO = _mapper.Map<List<Photo>, List<PhotoDTO>>(photoFromDB);
             return photosDTO;

@@ -1,4 +1,5 @@
-﻿using CoreTest.Models;
+﻿using CoreTest.Extensions;
+using CoreTest.Models;
 using CoreTest.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
@@ -12,8 +13,9 @@ namespace CoreTest.Services
 {
     public class IndexService : IIndexService
     {
-        public List<Photo> GetIndexService(Photo photoFromClient, List<Photo> photosInSession)
+        public async Task GetIndexServiceAsync(Photo photoFromClient, ISession Session, string sessionkey)
         {
+            List<Photo> photosInSession = Session.Get<List<Photo>>(sessionkey);
             Photo photo = new Photo();
             using (var reader = new BinaryReader(photoFromClient.FormFile.OpenReadStream()))
             {
@@ -26,10 +28,10 @@ namespace CoreTest.Services
             if (photosInSession != null)
             {
                 photosInSession.Add(photo);
-                return photosInSession;
+                Session.Set(sessionkey, photosInSession);
             } else
             {
-                return new List<Photo>() { photo };
+                Session.Set(sessionkey, new List<Photo>() { photo });
             }
         }
     }

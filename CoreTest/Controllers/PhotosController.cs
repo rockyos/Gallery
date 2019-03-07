@@ -51,15 +51,13 @@ namespace CoreTest.Controllers
 
         public async Task<IActionResult> GetListfromDB()
         {
-            List<Photo> sessionPhotos = Session.Get<List<Photo>>(sessionkey);
-            List<PhotoDTO> photos = await _getPhotoService.GetPhotoDBandSessionAsync(sessionPhotos, Session, sessionkey);
+            List<PhotoDTO> photos = await _getPhotoService.GetPhotoDBandSessionAsync(Session, sessionkey);
             return Json(photos);
         }
 
         public async Task<IActionResult> SavePhoto()
         {
-            List<Photo> sessionPhotos = Session.Get<List<Photo>>(sessionkey);
-            await _savePhotoService.SavePhotoAsync(sessionPhotos);
+            await _savePhotoService.SavePhotoAsync(Session, sessionkey);
             HttpContext.Session.Clear();
             return RedirectToAction(nameof(Index));
         }
@@ -76,9 +74,7 @@ namespace CoreTest.Controllers
         {
             if (ModelState.IsValid)
             {
-                List<Photo> sessionPhotos = Session.Get<List<Photo>>(sessionkey);
-                List<Photo> data = _indexService.GetIndexService(model, sessionPhotos);
-                Session.Set(sessionkey, data);
+                await _indexService.GetIndexServiceAsync(model, Session, sessionkey);
             }
             return RedirectToAction(nameof(Index));
         }
@@ -86,9 +82,7 @@ namespace CoreTest.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(string guid)
         {
-            List<Photo> sessionPhotos = Session.Get<List<Photo>>(sessionkey);
-            List<Photo> data = await _deleteService.DeleteAsync(guid, sessionPhotos);
-            Session.Set(sessionkey, data);
+            await _deleteService.DeleteAsync(guid, Session, sessionkey);
             return RedirectToAction(nameof(Index));
         }
     }

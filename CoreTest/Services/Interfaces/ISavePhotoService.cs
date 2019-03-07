@@ -1,4 +1,5 @@
 ﻿using CoreTest.Models;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,6 @@ namespace CoreTest.Services.Interfaces
 {
     public interface ISavePhotoService
     {
-        Task SavePhotoAsync(List<Photo> photosInSession);
+        Task SavePhotoAsync(ISession Session, string sessionkey);
     }
 }

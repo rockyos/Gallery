@@ -1,4 +1,5 @@
 ﻿using CoreTest.Models;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,6 @@ namespace CoreTest.Services.Interfaces
 {
     public interface IDeleteService
     {
-        Task<List<Photo>> DeleteAsync(string guid, List<Photo> photosInSession);
+        Task DeleteAsync(string guid, ISession Session, string sessionkey);
     }
 }

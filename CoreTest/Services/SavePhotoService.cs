@@ -1,6 +1,8 @@
-﻿using CoreTest.Models;
+﻿using CoreTest.Extensions;
+using CoreTest.Models;
 using CoreTest.Repository;
 using CoreTest.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,8 +15,9 @@ namespace CoreTest.Services
         {
         }
 
-        public async Task SavePhotoAsync(List<Photo> photosInSession)
+        public async Task SavePhotoAsync(ISession Session, string sessionkey)
         {
+            List<Photo> photosInSession = Session.Get<List<Photo>>(sessionkey);
             if (photosInSession != null)
             {
                 foreach (var item in photosInSession)
