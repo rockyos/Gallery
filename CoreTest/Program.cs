@@ -19,7 +19,7 @@ namespace CoreTest
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args).UseSerilog()
+            WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>();
     }
 }
