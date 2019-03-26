@@ -4,6 +4,7 @@ using CoreTest.Repository;
 using CoreTest.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -26,9 +27,11 @@ namespace CoreTest.Services
                     if (photoDB != null)
                     {
                         await UnitOfWork.PhotoRepository.RemoveAsync(photoDB);
+                        Log.Information("Remove photos from DB: {@PhotoDB}", photoDB);
                     }
                     else
                     {
+                        Log.Information("Add photos to DB: {@PhotoDB}", photoDB);
                         await UnitOfWork.PhotoRepository.InsertAsync(item);
                     }
                 }
