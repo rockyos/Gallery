@@ -7,6 +7,7 @@ using CoreTest.Models;
 using CoreTest.Repository;
 using CoreTest.Services;
 using CoreTest.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -49,6 +50,12 @@ namespace CoreTest
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options => //CookieAuthenticationOptions
+                {
+                    options.LoginPath = new PathString("/Account/Login");
+                });
+
             services.AddScoped<UnitOfWork>();
             services.AddScoped<IResizeService, ResizeService>();
             services.AddScoped<IGetPhotoService, GetPhotoService>();
@@ -87,6 +94,7 @@ namespace CoreTest
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+            app.UseAuthentication();
 
             app.UseMvc(routes =>
             {

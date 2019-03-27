@@ -3,6 +3,7 @@ using CoreTest.Models;
 using CoreTest.Repository;
 using CoreTest.Services;
 using CoreTest.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -42,7 +43,7 @@ namespace CoreTest.Controllers
             return new FileContentResult(resizedImage, "binary/octet-stream");
         }
 
-
+        [Authorize]
         public async Task<IActionResult> Index()
         {
             return View("Index");

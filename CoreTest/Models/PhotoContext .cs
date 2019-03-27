@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+
 
 namespace CoreTest.Models
 {
@@ -13,6 +11,7 @@ namespace CoreTest.Models
         }
 
         public DbSet<Photo> Photos { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 
 }
