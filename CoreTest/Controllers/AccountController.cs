@@ -4,6 +4,8 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using CoreTest.Models;
+using CoreTest.Repository;
+using CoreTest.Services;
 using CoreTest.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -14,10 +16,10 @@ namespace CoreTest.Controllers
 {
     public class AccountController : Controller
     {
-        private PhotoContext _db;
-        public AccountController(PhotoContext context)
+        protected UnitOfWork UnitOfWork { get; }
+        public AccountController(PhotoContext context, UnitOfWork unitOfWork)
         {
-            _db = context;
+            UnitOfWork = unitOfWork;
         }
 
         [HttpGet]
@@ -32,7 +34,7 @@ namespace CoreTest.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = await _db.Users.FirstOrDefaultAsync(u => u.Email == model.Email && u.Password == model.Password);
+                User user = await (await UnitOfWork.UserRepository.GetAllAsync()).FirstOrDefaultAsync(u => u.Email == model.Email && u.Password == model.Password);
                 if (user != null)
                 {
                     await Authenticate(model.Email); 
@@ -55,11 +57,11 @@ namespace CoreTest.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = await _db.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+                User user = await (await UnitOfWork.UserRepository.GetAllAsync()).FirstOrDefaultAsync(u => u.Email == model.Email);
                 if (user == null)
                 {
-                    _db.Users.Add(new User { Email = model.Email, Password = model.Password });
-                    await _db.SaveChangesAsync();
+                    await UnitOfWork.UserRepository.InsertAsync(new User { Email = model.Email, Password = model.Password });
+                    await UnitOfWork.SubmitChangesAsync();
                     await Authenticate(model.Email); 
                     return RedirectToAction("Index", "Photos");
                 } 
