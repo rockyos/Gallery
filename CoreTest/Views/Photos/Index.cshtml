@@ -4,6 +4,15 @@
     ViewData["Title"] = "Index";
 }
 
+
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="d-flex justify-content-end">
+        <span>Hello @User.Identity.Name </span>,&nbsp;
+        <a href="@Url.Action("Logout", "Account")">Exit</a>
+    </div>
+}
+
 <table id="imagesTable" class="table table-borderless" data-toggle="table" data-unique-id="id"
        data-url="@(Url.Action("GetListfromDB","Photos"))"></table>
 

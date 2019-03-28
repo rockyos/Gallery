@@ -84,6 +84,9 @@ body {
     list-style-type: none;
 }
 
+form {
+ margin-top: 1rem;
+}
 /*.fixed-table-loading {
     display:none;
 }*/

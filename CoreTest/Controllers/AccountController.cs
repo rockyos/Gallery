@@ -40,7 +40,7 @@ namespace CoreTest.Controllers
                     await Authenticate(model.Email); 
                     return RedirectToAction("Index", "Photos");
                 }
-                ModelState.AddModelError("", "Incorrect username/password");
+                ModelState.AddModelError("", "Wrong login/password");
             }
             return View(model);
         }
@@ -65,7 +65,7 @@ namespace CoreTest.Controllers
                     await Authenticate(model.Email); 
                     return RedirectToAction("Index", "Photos");
                 } 
-                ModelState.AddModelError("", "Incorrect username/password");
+                ModelState.AddModelError("", "Wrong login/password");
             }
             return View(model);
         }
