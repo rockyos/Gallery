@@ -2,6 +2,7 @@
 using AutoMapper;
 using CoreTest.Automapper;
 using CoreTest.Models;
+using CoreTest.Models.Entity;
 using CoreTest.Repository;
 using CoreTest.Services;
 using CoreTest.Services.Interfaces;

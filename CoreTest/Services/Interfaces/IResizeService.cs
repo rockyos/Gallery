@@ -1,6 +1,7 @@
 ﻿using CoreTest.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CoreTest.Models.Entity;
 
 namespace CoreTest.Services.Interfaces
 {

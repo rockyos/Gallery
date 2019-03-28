@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 
-
-namespace CoreTest.Models
+namespace CoreTest.Models.Entity
 {
     public class Photo
     {

@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CoreTest.Models.Dto;
+using CoreTest.Models.Entity;
 
 namespace CoreTest.Services
 {

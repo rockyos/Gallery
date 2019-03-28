@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using CoreTest.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using CoreTest.Extensions;
+using CoreTest.Models.Entity;
 
 namespace CoreTest.Services
 {

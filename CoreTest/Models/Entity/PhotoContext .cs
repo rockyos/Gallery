@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-
-namespace CoreTest.Models
+namespace CoreTest.Models.Entity
 {
     public sealed class PhotoContext : DbContext
     {

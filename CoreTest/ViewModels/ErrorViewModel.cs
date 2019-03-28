@@ -1,5 +1,5 @@
 
-namespace CoreTest.Models
+namespace CoreTest.ViewModels
 {
     public class ErrorViewModel
     {

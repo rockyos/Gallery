@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CoreTest.Models.Entity;
 
 namespace CoreTest.Services
 {

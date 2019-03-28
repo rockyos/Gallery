@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using CoreTest.Models;
+using CoreTest.Models.Dto;
+using CoreTest.Models.Entity;
 
 namespace CoreTest.Automapper
 {

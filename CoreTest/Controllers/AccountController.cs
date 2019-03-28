@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using CoreTest.Models;
+using CoreTest.Models.Entity;
 using CoreTest.Repository;
 using CoreTest.ViewModels;
 using Microsoft.AspNetCore.Authentication;

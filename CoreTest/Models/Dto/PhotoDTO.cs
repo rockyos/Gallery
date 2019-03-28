@@ -1,5 +1,5 @@
 ﻿
-namespace CoreTest.Models
+namespace CoreTest.Models.Dto
 {
     public class PhotoDto
     {

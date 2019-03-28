@@ -1,6 +1,7 @@
 ﻿using CoreTest.Models;
 using CoreTest.Repository.Interfaces;
 using System.Threading.Tasks;
+using CoreTest.Models.Entity;
 
 namespace CoreTest.Repository
 {
