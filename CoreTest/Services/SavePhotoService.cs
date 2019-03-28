@@ -16,20 +16,20 @@ namespace CoreTest.Services
         {
         }
 
-        public async Task SavePhotoAsync(ISession Session, string sessionkey)
+        public async Task SavePhotoAsync(ISession session, string sessionkey)
         {
             var log = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.Console().WriteTo.RollingFile("logs\\log-{Date}.txt").CreateLogger();
             
-            List<Photo> photosInSession = Session.Get<List<Photo>>(sessionkey);
+            var photosInSession = session.Get<List<Photo>>(sessionkey);
             if (photosInSession != null)
             {
                 foreach (var item in photosInSession)
                 {
-                    Photo photoDB = await (await UnitOfWork.PhotoRepository.GetAllAsync()).FirstOrDefaultAsync(m => m.Guid == item.Guid);
-                    if (photoDB != null)
+                    var photoDb = await (await UnitOfWork.PhotoRepository.GetAllAsync()).FirstOrDefaultAsync(m => m.Guid == item.Guid);
+                    if (photoDb != null)
                     {
-                        log.Information("Remove photos from DB: {@PhotoDB}", photoDB);
-                        await UnitOfWork.PhotoRepository.RemoveAsync(photoDB);
+                        log.Information("Remove photos from DB: {@PhotoDB}", photoDb);
+                        await UnitOfWork.PhotoRepository.RemoveAsync(photoDb);
                     }
                     else
                     {

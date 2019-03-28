@@ -3,9 +3,9 @@
 
 namespace CoreTest.Models
 {
-    public class PhotoContext : DbContext
+    public sealed class PhotoContext : DbContext
     {
-        public PhotoContext(DbContextOptions<PhotoContext> options) : base(options)
+        public PhotoContext(DbContextOptions options) : base(options)
         {
             Database.EnsureCreated();
         }

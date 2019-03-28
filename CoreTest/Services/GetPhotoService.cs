@@ -5,43 +5,40 @@ using CoreTest.Repository;
 using CoreTest.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace CoreTest.Services
 {
     public class GetPhotoService : BaseService, IGetPhotoService
     {
-        private IMapper _mapper;
+        private readonly IMapper _mapper;
         public GetPhotoService(UnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork)
         {
             _mapper = mapper;
         }
 
-        public async Task<List<PhotoDTO>> GetPhotoDBandSessionAsync( ISession Session, string sessionkey)
+        public async Task<List<PhotoDto>> GetPhotoDBandSessionAsync( ISession session, string sessionkey)
         {
-            List<Photo> photosFromSession = Session.Get<List<Photo>>(sessionkey);
-            List<Photo> photoFromDB = await (await UnitOfWork.PhotoRepository.GetAllAsync()).ToListAsync();
+            var photosFromSession = session.Get<List<Photo>>(sessionkey);
+            var photoFromDb = await (await UnitOfWork.PhotoRepository.GetAllAsync()).ToListAsync();
             if (photosFromSession != null)
             {
-                List<Photo> hidePhotoFromSession = new List<Photo>();
+                var hidePhotoFromSession = new List<Photo>();
                 foreach (var item in photosFromSession)
                 {
-                    Photo photo = photoFromDB.Find(c => c.Guid == item.Guid);
+                    var photo = photoFromDb.Find(c => c.Guid == item.Guid);
                     if (photo != null)
                     {
-                        photoFromDB.Remove(photo);
+                        photoFromDb.Remove(photo);
                         hidePhotoFromSession.Add(item);
                     }
                 }
                 photosFromSession.RemoveAll(i => hidePhotoFromSession.Contains(i));
-                photoFromDB.AddRange(photosFromSession);
+                photoFromDb.AddRange(photosFromSession);
             }
-            List<PhotoDTO> photosDTO = _mapper.Map<List<Photo>, List<PhotoDTO>>(photoFromDB);
-            return photosDTO;
+            var photosDto = _mapper.Map<List<Photo>, List<PhotoDto>>(photoFromDb);
+            return photosDto;
         }
     }
 }

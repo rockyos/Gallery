@@ -1,9 +1,6 @@
 ﻿using CoreTest.Models;
 using CoreTest.Repository;
-using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using CoreTest.Services.Interfaces;
@@ -18,17 +15,17 @@ namespace CoreTest.Services
         {   
         }
 
-        public async Task DeleteAsync(string guid, ISession Session, string sessionkey)
+        public async Task DeleteAsync(string guid, ISession session, string sessionkey)
         {
-            List<Photo> photosInSession = Session.Get<List<Photo>>(sessionkey);
-            Photo photoDB = await (await UnitOfWork.PhotoRepository.GetAllAsync()).FirstOrDefaultAsync(m => m.Guid == guid);
-            if (photoDB != null)
+            var photosInSession = session.Get<List<Photo>>(sessionkey);
+            var photoDb = await (await UnitOfWork.PhotoRepository.GetAllAsync()).FirstOrDefaultAsync(m => m.Guid == guid);
+            if (photoDb != null)
             {
                 if(photosInSession == null)
                 {
                     photosInSession = new List<Photo>();
                 }
-                photosInSession.Add(photoDB);
+                photosInSession.Add(photoDb);
             } else
             {
                 foreach (var item in photosInSession)
@@ -40,7 +37,7 @@ namespace CoreTest.Services
                     }
                 }
             }
-           Session.Set(sessionkey, photosInSession);
+           session.Set(sessionkey, photosInSession);
         }
     }
 }
