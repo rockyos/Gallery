@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -35,6 +36,8 @@ namespace CoreTest
             string conn = Configuration.GetConnectionString("ConnectionToDB");
             services.AddDbContext<PhotoContext>(options =>
                 options.UseSqlServer(conn));
+            services.AddDefaultIdentity<IdentityUser>()
+               .AddEntityFrameworkStores<PhotoContext>();
 
             services.AddDistributedMemoryCache(); // IDistributedCache
             services.AddSession(options =>
@@ -48,12 +51,6 @@ namespace CoreTest
                 options.CheckConsentNeeded = context => false;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options => //CookieAuthenticationOptions
-                {
-                    options.LoginPath = new PathString("/Account/Login");
-                });
 
             services.AddScoped<UnitOfWork>();
             services.AddScoped<IResizeService, ResizeService>();
