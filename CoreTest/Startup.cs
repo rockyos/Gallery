@@ -24,7 +24,6 @@ namespace CoreTest
     {
         public Startup(IConfiguration configuration)
         {
-            Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.Console().WriteTo.RollingFile("logs\\log-{Date}.txt").CreateLogger();
             Configuration = configuration;
         }
 
@@ -34,8 +33,8 @@ namespace CoreTest
         public void ConfigureServices(IServiceCollection services)
         {
             string conn = Configuration.GetConnectionString("ConnectionToDB");
-            services.AddDbContext<PhotoContext>(options =>
-                options.UseSqlServer(conn));
+            services.AddDbContext<PhotoContext>(options => options.UseSqlServer(conn));
+
             services.AddDefaultIdentity<IdentityUser>()
                .AddEntityFrameworkStores<PhotoContext>();
 

@@ -6,13 +6,8 @@
 }
 
 
-@if (User.Identity.IsAuthenticated)
-{
-    <div class="d-flex justify-content-end">
-        <span>Hello @User.Identity.Name </span>,&nbsp;
-        <a href="@Url.Action("Logout", "Account")">Exit</a>
-    </div>
-}
+<partial name="_LoginPartial" />
+
 
 <table id="imagesTable" class="table table-borderless" data-toggle="table" data-unique-id="id"
        data-url="@(Url.Action("GetListfromDb","Photos"))"></table>
