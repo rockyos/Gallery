@@ -1,26 +1,26 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
+using System;
 
 namespace CoreTest.Migrations
 {
-    public partial class AddUserMigration : Migration
+    public partial class AddAspNetIdentity : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "AspNetRoles",
-                columns: table => new
-                {
-                    Id = table.Column<string>(nullable: false),
-                    Name = table.Column<string>(maxLength: 256, nullable: true),
-                    NormalizedName = table.Column<string>(maxLength: 256, nullable: true),
-                    ConcurrencyStamp = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
-                });
+                          name: "AspNetRoles",
+                          columns: table => new
+                          {
+                              Id = table.Column<string>(nullable: false),
+                              Name = table.Column<string>(maxLength: 256, nullable: true),
+                              NormalizedName = table.Column<string>(maxLength: 256, nullable: true),
+                              ConcurrencyStamp = table.Column<string>(nullable: true)
+                          },
+                          constraints: table =>
+                          {
+                              table.PrimaryKey("PK_AspNetRoles", x => x.Id);
+                          });
 
             migrationBuilder.CreateTable(
                 name: "AspNetUsers",
@@ -45,21 +45,6 @@ namespace CoreTest.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Photos",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Guid = table.Column<string>(nullable: true),
-                    ImageContent = table.Column<byte[]>(nullable: true),
-                    PhotoName = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Photos", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -224,9 +209,6 @@ namespace CoreTest.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
-
-            migrationBuilder.DropTable(
-                name: "Photos");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
