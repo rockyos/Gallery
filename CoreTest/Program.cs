@@ -56,7 +56,6 @@ namespace CoreTest
         {
             try
             {
-                // Requires using RazorPagesMovie.Models;
                 var context = services.GetRequiredService<PhotoContext>();
                 context.Database.Migrate();
             }
@@ -71,8 +70,6 @@ namespace CoreTest
             return WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
                 .UseSerilog()
-                //.UseDefaultServiceProvider(options =>
-                //    options.ValidateScopes = false)
                 .Build();
         }
     }
