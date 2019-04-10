@@ -33,8 +33,10 @@ namespace CoreTest
             string conn = Configuration.GetConnectionString("ConnectionToDB");
             services.AddDbContext<PhotoContext>(options => options.UseSqlServer(conn));
 
-            services.AddIdentity<IdentityUser, IdentityRole>()
-                .AddEntityFrameworkStores<PhotoContext>();
+            services.AddIdentity<IdentityUser, IdentityRole>(config =>
+            {
+                config.SignIn.RequireConfirmedEmail = false;
+            }).AddEntityFrameworkStores<PhotoContext>();
 
             services.AddTransient<IEmailSender, EmailSenderService>(i =>
                new EmailSenderService(
