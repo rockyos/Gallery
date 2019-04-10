@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -32,8 +33,18 @@ namespace CoreTest
             string conn = Configuration.GetConnectionString("ConnectionToDB");
             services.AddDbContext<PhotoContext>(options => options.UseSqlServer(conn));
 
-            services.AddDefaultIdentity<IdentityUser>()
-               .AddEntityFrameworkStores<PhotoContext>();
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<PhotoContext>();
+
+            services.AddTransient<IEmailSender, EmailSenderService>(i =>
+               new EmailSenderService(
+                   Configuration["EmailSender:Host"],
+                   Configuration.GetValue<int>("EmailSender:Port"),
+                   Configuration.GetValue<bool>("EmailSender:EnableSSL"),
+                   Configuration["EmailSender:UserName"],
+                   Configuration["EmailSender:Password"]
+               )
+);
 
             services.AddDistributedMemoryCache(); // IDistributedCache
             services.AddSession(options =>

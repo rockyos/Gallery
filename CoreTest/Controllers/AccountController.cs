@@ -1,6 +1,9 @@
-﻿using System.Text.Encodings.Web;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using CoreTest.ViewModels;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -16,6 +19,9 @@ namespace CoreTest.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ILogger<RegisterViewModel> _logger;
         private readonly IEmailSender _emailSender;
+
+        public IList<AuthenticationScheme> ExternalLogins { get; set; }
+
 
         public AccountController(
            UserManager<IdentityUser> userManager,
@@ -56,7 +62,7 @@ namespace CoreTest.Controllers
                         protocol: Request.Scheme);
 
                     await _emailSender.SendEmailAsync(model.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                      $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return LocalRedirect(model.ReturnUrl); 
@@ -70,8 +76,10 @@ namespace CoreTest.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login(string returnUrl = null)
+        public async Task<IActionResult> Login(string returnUrl = null)
         {
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             return View(new LoginViewModel{ReturnUrl = returnUrl ?? Url.Content("~/")});
         }
 
@@ -79,6 +87,8 @@ namespace CoreTest.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
+            model.ReturnUrl = model.ReturnUrl ?? Url.Content("~/");
+
             if (ModelState.IsValid)
             {
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: true);

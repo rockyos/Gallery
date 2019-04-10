@@ -1,14 +1,12 @@
-﻿@model CoreTest.ViewModels.LoginViewModel
+﻿@page
+@model CoreTest.ViewModels.LoginViewModel
 
-@{
-    ViewData["Title"] = "Log in";
-}
 
-<h2>@ViewData["Title"]</h2>
+<h2>Log in</h2>
 <div class="row">
     <div class="col-md-4">
         <section>
-            <form method="post">
+            <form asp-controller="Account" asp-action="Login" method="post"  asp-route-returnUrl="@Model.ReturnUrl">
                 <h4>Use a local account to log in.</h4>
                 <hr />
                 <div asp-validation-summary="All" class="text-danger"></div>
