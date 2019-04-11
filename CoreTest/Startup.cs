@@ -36,7 +36,8 @@ namespace CoreTest
             services.AddIdentity<IdentityUser, IdentityRole>(config =>
             {
                 config.SignIn.RequireConfirmedEmail = false;
-            }).AddEntityFrameworkStores<PhotoContext>();
+            }).AddEntityFrameworkStores<PhotoContext>()
+            .AddDefaultTokenProviders();
 
             services.AddTransient<IEmailSender, EmailSenderService>(i =>
                new EmailSenderService(

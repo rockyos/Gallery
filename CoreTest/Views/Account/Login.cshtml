@@ -1,5 +1,4 @@
-﻿@page
-@model CoreTest.ViewModels.LoginViewModel
+﻿@model CoreTest.ViewModels.LoginViewModel
 
 
 <h2>Log in</h2>
@@ -33,10 +32,10 @@
                 </div>
                 <div class="form-group">
                     <p>
-                        <a asp-page="./ForgotPassword">Forgot your password?</a>
+                        <a asp-controller="Account" asp-action="ForgotPassword">Forgot your password?</a>
                     </p>
                     <p>
-                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
+                        <a asp-controller="Account" asp-action="Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
                     </p>
                 </div>
             </form>
