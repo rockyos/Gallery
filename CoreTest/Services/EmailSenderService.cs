@@ -1,40 +1,63 @@
-﻿using Microsoft.AspNetCore.Identity.UI.Services;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
+using MimeKit;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Mail;
+using MailKit.Net.Smtp;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using CoreTest.Models.Email;
 
 namespace CoreTest.Services
 {
     public class EmailSenderService : IEmailSender
     {
-        private string host;
-        private int port;
-        private bool enableSSL;
-        private string userName;
-        private string password;
+        private readonly EmailSettings _emailSettings;
+        private readonly IHostingEnvironment _env;
 
-        public EmailSenderService(string host, int port, bool enableSSL, string userName, string password)
+        public EmailSenderService(
+            IOptions<EmailSettings> emailSettings,
+            IHostingEnvironment env)
         {
-            this.host = host;
-            this.port = port;
-            this.enableSSL = enableSSL;
-            this.userName = userName;
-            this.password = password;
+            _emailSettings = emailSettings.Value;
+            _env = env;
         }
 
-        public Task SendEmailAsync(string email, string subject, string htmlMessage)
+        public async Task SendEmailAsync(string email, string subject, string message)
         {
-            var client = new SmtpClient(host, port)
+            try
             {
-                Credentials = new NetworkCredential(userName, password),
-                EnableSsl = enableSSL
-            };
-            return client.SendMailAsync(
-                new MailMessage(userName, email, subject, htmlMessage) { IsBodyHtml = true }
-            );
+                var mimeMessage = new MimeMessage();
+                mimeMessage.From.Add(new MailboxAddress(_emailSettings.SenderName, _emailSettings.Sender));
+                mimeMessage.To.Add(new MailboxAddress(email));
+                mimeMessage.Subject = subject;
+                mimeMessage.Body = new TextPart("html")
+                {
+                    Text = message
+                };
+
+                using (var client = new SmtpClient())
+                {
+                    client.ServerCertificateValidationCallback = (s, c, h, e) => true;
+
+                    if (_env.IsDevelopment())
+                    {
+                        await client.ConnectAsync(_emailSettings.MailServer, _emailSettings.MailPort, true);
+                    }
+                    else
+                    {
+                        await client.ConnectAsync(_emailSettings.MailServer);
+                    }
+                    await client.AuthenticateAsync(_emailSettings.Sender, _emailSettings.Password);
+                    await client.SendAsync(mimeMessage);
+                    await client.DisconnectAsync(true);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(ex.Message);
+            }
         }
+
     }
 }

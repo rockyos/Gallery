@@ -1,6 +1,7 @@
 ﻿using System;
 using AutoMapper;
 using CoreTest.Automapper;
+using CoreTest.Models.Email;
 using CoreTest.Models.Entity;
 using CoreTest.Repository;
 using CoreTest.Services;
@@ -39,15 +40,9 @@ namespace CoreTest
             }).AddEntityFrameworkStores<PhotoContext>()
             .AddDefaultTokenProviders();
 
-            services.AddTransient<IEmailSender, EmailSenderService>(i =>
-               new EmailSenderService(
-                   Configuration["EmailSender:Host"],
-                   Configuration.GetValue<int>("EmailSender:Port"),
-                   Configuration.GetValue<bool>("EmailSender:EnableSSL"),
-                   Configuration["EmailSender:UserName"],
-                   Configuration["EmailSender:Password"]
-               )
-);
+            services.Configure<EmailSettings>(Configuration.GetSection("EmailSettings"));
+            services.AddSingleton<IEmailSender, EmailSenderService>();
+
 
             services.AddDistributedMemoryCache(); // IDistributedCache
             services.AddSession(options =>
