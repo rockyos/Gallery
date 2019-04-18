@@ -139,11 +139,9 @@ namespace CoreTest.Controllers
                 }
 
                 var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var callbackUrl = Url.Page(
-                    "/Account/ResetPassword",
-                    pageHandler: null,
-                    values: new { code },
-                    protocol: Request.Scheme);
+
+                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code });
+                callbackUrl = $"http://localhost:49508{callbackUrl}";
 
                 await _emailSender.SendEmailAsync(
                     model.Email,
